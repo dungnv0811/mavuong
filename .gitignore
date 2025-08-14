@@ -1,0 +1,17 @@
+# Maven/Gradle/Node build outputs
+target/
+build/
+dist/
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

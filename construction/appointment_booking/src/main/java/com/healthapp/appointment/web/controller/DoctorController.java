@@ -2,6 +2,7 @@ package com.healthapp.appointment.web.controller;
 
 import com.healthapp.appointment.application.dto.DoctorDto;
 import com.healthapp.appointment.application.service.DoctorApplicationService;
+import com.healthapp.appointment.domain.model.doctor.DoctorSchedule;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -21,5 +22,25 @@ public class DoctorController {
             return doctorService.getDoctorsBySpecialty(specialty);
         }
         return doctorService.getAllDoctors();
+    }
+
+    @GetMapping("/{id}/availability")
+    public List<String> getDoctorAvailability(@PathVariable Long id) {
+        return doctorService.getDoctorAvailability(id);
+    }
+
+    @GetMapping("/{id}")
+    public DoctorDto getDoctor(@PathVariable Long id) {
+        return doctorService.getDoctorById(id);
+    }
+
+    @PostMapping("/{id}/schedule")
+    public DoctorSchedule upsertSchedule(@PathVariable Long id, @RequestBody DoctorSchedule schedule) {
+        return doctorService.saveSchedule(new DoctorSchedule(
+            id,
+            schedule.getDayOfWeek(),
+            schedule.getStartTime(),
+            schedule.getEndTime()
+        ));
     }
 }

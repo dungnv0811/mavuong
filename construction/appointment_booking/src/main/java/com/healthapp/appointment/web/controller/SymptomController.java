@@ -1,7 +1,7 @@
 package com.healthapp.appointment.web.controller;
 
+import com.healthapp.appointment.application.service.SymptomApplicationService;
 import com.healthapp.appointment.domain.model.symptom.SymptomAnalysis;
-import com.healthapp.appointment.domain.service.SymptomAnalysisService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -9,15 +9,15 @@ import java.util.List;
 @RequestMapping("/api/symptoms")
 @CrossOrigin(origins = "http://localhost:4200")
 public class SymptomController {
-    private final SymptomAnalysisService symptomService;
+    private final SymptomApplicationService symptomService;
     
-    public SymptomController(SymptomAnalysisService symptomService) {
+    public SymptomController(SymptomApplicationService symptomService) {
         this.symptomService = symptomService;
     }
     
     @PostMapping("/analyze")
     public SymptomAnalysisResponse analyzeSymptoms(@RequestBody SymptomAnalysisRequest request) {
-        SymptomAnalysis analysis = symptomService.analyzeSymptoms(request.patientId(), request.description());
+        SymptomAnalysis analysis = symptomService.analyze(request.patientId(), request.description());
         return new SymptomAnalysisResponse(analysis.getSuggestedSpecialties());
     }
     

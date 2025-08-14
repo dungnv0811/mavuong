@@ -10,4 +10,5 @@ public interface DoctorRepository {
     List<Doctor> findBySpecialty(String specialty);
     List<Doctor> findAll();
     Doctor save(Doctor doctor);
+    // schedule and ratings will be handled via separate repositories/services
 }

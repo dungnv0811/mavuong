@@ -27,6 +27,7 @@ public class Doctor {
     
     @ElementCollection
     @CollectionTable(name = "doctor_specialties", joinColumns = @JoinColumn(name = "doctor_id"))
+    @Column(name = "specialty_type")
     private List<String> specialties;
     
     protected Doctor() {}

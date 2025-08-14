@@ -24,6 +24,7 @@ public class SymptomAnalysis {
     
     @ElementCollection
     @CollectionTable(name = "recommendations", joinColumns = @JoinColumn(name = "analysis_id"))
+    @Column(name = "specialty")
     private List<String> suggestedSpecialties;
     
     protected SymptomAnalysis() {}

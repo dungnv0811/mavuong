@@ -42,6 +42,21 @@ public class AppointmentController {
     public AppointmentDto confirmAppointment(@PathVariable Long id) {
         return appointmentService.confirmAppointment(id);
     }
+
+    @DeleteMapping("/{id}")
+    public AppointmentDto cancelAppointment(@PathVariable Long id) {
+        return appointmentService.cancelAppointment(id);
+    }
+
+    @PutMapping("/{id}")
+    public AppointmentDto rescheduleAppointment(@PathVariable Long id, @RequestBody RescheduleRequest request) {
+        return appointmentService.rescheduleAppointment(id, request.newDateTime());
+    }
+
+    @GetMapping("/{id}")
+    public AppointmentDto getById(@PathVariable Long id) {
+        return appointmentService.getAppointmentById(id);
+    }
     
     public record BookAppointmentRequest(
         Long patientId,
@@ -49,4 +64,6 @@ public class AppointmentController {
         LocalDateTime appointmentDateTime,
         String notes
     ) {}
+
+    public record RescheduleRequest(LocalDateTime newDateTime) {}
 }

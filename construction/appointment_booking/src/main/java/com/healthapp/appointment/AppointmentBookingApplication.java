@@ -1,12 +1,17 @@
 package com.healthapp.appointment;
 
 import com.healthapp.appointment.domain.model.doctor.Doctor;
+import com.healthapp.appointment.domain.model.doctor.DoctorSchedule;
 import com.healthapp.appointment.infrastructure.repository.JpaDoctorRepository;
+import com.healthapp.appointment.infrastructure.repository.JpaDoctorScheduleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import java.util.Arrays;
+import java.util.List;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 @SpringBootApplication
 public class AppointmentBookingApplication {
@@ -16,19 +21,8 @@ public class AppointmentBookingApplication {
     }
     
     @Bean
-    CommandLineRunner initData(JpaDoctorRepository doctorRepository) {
-        return args -> {
-            // Seed doctors
-            doctorRepository.save(new Doctor("Dr. John Smith", "john.smith@hospital.com", 
-                "555-0101", "MD Cardiology", Arrays.asList("cardiology")));
-            doctorRepository.save(new Doctor("Dr. Sarah Johnson", "sarah.johnson@hospital.com", 
-                "555-0102", "MD Dermatology", Arrays.asList("dermatology")));
-            doctorRepository.save(new Doctor("Dr. Mike Wilson", "mike.wilson@hospital.com", 
-                "555-0103", "MD Orthopedics", Arrays.asList("orthopedics")));
-            doctorRepository.save(new Doctor("Dr. Lisa Brown", "lisa.brown@hospital.com", 
-                "555-0104", "MD Neurology", Arrays.asList("neurology")));
-            doctorRepository.save(new Doctor("Dr. David Lee", "david.lee@hospital.com", 
-                "555-0105", "MD General Practice", Arrays.asList("general")));
-        };
+    CommandLineRunner initData(JpaDoctorRepository doctorRepository, JpaDoctorScheduleRepository scheduleRepository) {
+        // Data is seeded via schema.sql and data.sql now
+        return args -> {};
     }
 }
