@@ -22,9 +22,7 @@ public class SymptomAnalysis {
     @Column(name = "analyzed_at")
     private LocalDateTime analyzedAt = LocalDateTime.now();
     
-    @ElementCollection
-    @CollectionTable(name = "recommendations", joinColumns = @JoinColumn(name = "analysis_id"))
-    @Column(name = "specialty")
+    @Transient
     private List<String> suggestedSpecialties;
     
     protected SymptomAnalysis() {}

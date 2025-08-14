@@ -32,10 +32,10 @@ VALUES
 
 -- Recommendations for analyses
 -- H2 identity starts at 1; first two rows above become IDs 1 and 2
-INSERT INTO recommendations (analysis_id, specialty)
+INSERT INTO recommendations (analysis_id, specialty, confidence, suggested_doctor_ids)
 VALUES
-  (1, 'cardiology'),
-  (2, 'dermatology');
+  (1, 'cardiology', 0.95, '1'),
+  (2, 'dermatology', 0.92, '2');
 
 -- Appointments
 INSERT INTO appointments (patient_id, doctor_id, appointment_date_time, duration_minutes, notes, status, time_zone, created_at)
