@@ -32,13 +32,20 @@ export class DashboardComponent implements OnInit {
     if (!user?.uuid) return;
 
     this.isLoading.set(true);
+    
+    // For both doctors and patients, use username instead of UUID to properly map to database IDs
+    const userIdentifier = user.username;
+    console.log('🏥 Dashboard loading appointments for user:', userIdentifier, 'role:', user.userRole);
+    
     // Use paginated method but just get the first 5 appointments for dashboard
-    this.appointmentService.getUpcomingAppointmentsPaginated(user.uuid, 0, 5).subscribe({
+    this.appointmentService.getUpcomingAppointmentsPaginated(userIdentifier, 0, 5).subscribe({
       next: (response) => {
+        console.log('🏥 Dashboard received appointments:', response);
         this.upcoming.set(response.appointments);
         this.isLoading.set(false);
       },
-      error: () => {
+      error: (error) => {
+        console.error('🏥 Dashboard error loading appointments:', error);
         this.isLoading.set(false);
       }
     });

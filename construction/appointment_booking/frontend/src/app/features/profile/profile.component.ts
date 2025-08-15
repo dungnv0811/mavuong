@@ -33,13 +33,18 @@ export class ProfileComponent implements OnInit {
 
   private loadAppointmentHistory(): void {
     const user = this.authService.getCurrentUser();
-    if (user?.uuid) {
+    if (user?.username) {
+      // Use username instead of UUID to properly map to database IDs
+      console.log('👤 Profile loading appointment history for user:', user.username, 'role:', user.userRole);
+      
       // Use paginated method for better performance, but just get the first page
-      this.appointmentService.getAppointmentHistoryPaginated(user.uuid, 0, 20).subscribe({
+      this.appointmentService.getAppointmentHistoryPaginated(user.username, 0, 20).subscribe({
         next: (response) => {
+          console.log('👤 Profile received appointment history:', response);
           this.history.set(response.appointments);
         },
-        error: () => {
+        error: (error) => {
+          console.error('👤 Profile error loading appointment history:', error);
           this.history.set([]);
         }
       });

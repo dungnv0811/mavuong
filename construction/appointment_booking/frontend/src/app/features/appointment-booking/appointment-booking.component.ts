@@ -8,7 +8,6 @@ import { AuthService } from '../../core/auth/auth.service';
 import { AppointmentService } from '../../core/services/appointment.service';
 import { TimeSlot } from '../../shared/models/schedule.model';
 import { AppointmentModel, AppointmentStatus } from '../../shared/models/booking-docter-models';
-import {DEFAULT_AVATAR_FEMALE, DEFAULT_AVATAR_MALE} from '../constants/common.constants';
 
 @Component({
   selector: 'app-appointment-booking',
@@ -28,7 +27,7 @@ export class AppointmentBookingComponent implements OnInit {
 
   doctor = signal({
     doctorID: '',
-    name: 'Dr. Emily Chen11111',
+    name: 'Dr. Emily Chen',
     specialty: 'Pediatrician',
     rating: 4.9,
     reviews: 230,
@@ -85,15 +84,11 @@ export class AppointmentBookingComponent implements OnInit {
 
   private loadDoctorInfo(): void {
     const doctorID = this.route.snapshot.queryParams['doctorID'];
-    console.log('-------------doctorID---------------------------')
-    console.log(doctorID)
     if (!doctorID) return;
 
     this.isLoading.set(true);
     this.doctorBookingService.getDoctorBookingInfo(doctorID).subscribe({
       next: (doctorInfo) => {
-        console.log('-------------doctorInfo---------------------------')
-        console.log(doctorInfo)
         if (doctorInfo) {
           this.doctor.set({
             doctorID: doctorInfo.doctorID,
@@ -107,7 +102,6 @@ export class AppointmentBookingComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        console.log('-------------doctorInfo--2errrr-------------------------')
         this.isLoading.set(false);
       }
     });
@@ -155,11 +149,11 @@ export class AppointmentBookingComponent implements OnInit {
   }
 
   viewDoctorProfile(): void {
-    console.log('-------------------------------------------------')
-    console.log(this.viewingAppointment())
-    this.router.navigate(['health-connect/doctor/profile'], {
-      queryParams: { doctorID: this.doctor().doctorID }
-    });
+    if (this.doctor().doctorID) {
+      this.router.navigate(['health-connect/doctor/profile'], {
+        queryParams: { doctorID: this.doctor().doctorID }
+      });
+    }
   }
 
   submit() {
@@ -214,8 +208,4 @@ export class AppointmentBookingComponent implements OnInit {
       }
     });
   }
-
-  protected readonly Math = Math;
-  protected readonly DEFAULT_AVATAR_MALE = DEFAULT_AVATAR_MALE;
-  protected readonly DEFAULT_AVATAR_FEMALE = DEFAULT_AVATAR_FEMALE;
 }

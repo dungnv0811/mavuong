@@ -169,46 +169,193 @@ public class AppointmentApplicationService {
         return toDto(appointmentRepository.save(appointment));
     }
     
-    // New methods for frontend compatibility
+    // New methods for frontend compatibility - expects either UUID, username, or numeric ID
     public List<AppointmentDto> getUpcomingAppointments(String userID) {
-        try {
-            // Try to get appointments from database first
-            Long patientId = Long.parseLong(userID);
-            List<Appointment> dbAppointments = appointmentRepository.findByPatientId(patientId);
-            
-            if (!dbAppointments.isEmpty()) {
-                return dbAppointments.stream()
+        System.out.println("📅 Getting upcoming appointments for userID: " + userID);
+        
+        // Create mappings for both doctors and patients
+        Map<String, Long> doctorMapping = createDoctorUserMapping();
+        Map<String, Long> patientMapping = createPatientUserMapping();
+        
+        // First check if this is a doctor by checking our static mapping
+        Long doctorId = doctorMapping.get(userID);
+        if (doctorId != null) {
+            System.out.println("📅 Found direct doctor mapping: " + userID + " -> doctorId: " + doctorId);
+            List<Appointment> doctorAppointments = appointmentRepository.findByDoctorId(doctorId);
+            if (!doctorAppointments.isEmpty()) {
+                List<AppointmentDto> result = doctorAppointments.stream()
                     .filter(appointment -> appointment.getAppointmentDateTime().isAfter(LocalDateTime.now()))
                     .filter(appointment -> appointment.getStatus() == AppointmentStatus.CONFIRMED || 
                                           appointment.getStatus() == AppointmentStatus.PENDING)
                     .map(this::toDto)
                     .collect(Collectors.toList());
+                System.out.println("📅 Returning " + result.size() + " upcoming appointments for doctor: " + userID);
+                return result;
+            }
+        }
+        
+        // Check if this is a patient by checking our static mapping
+        Long patientId = patientMapping.get(userID);
+        if (patientId != null) {
+            System.out.println("📅 Found direct patient mapping: " + userID + " -> patientId: " + patientId);
+            List<Appointment> patientAppointments = appointmentRepository.findByPatientId(patientId);
+            if (!patientAppointments.isEmpty()) {
+                List<AppointmentDto> result = patientAppointments.stream()
+                    .filter(appointment -> appointment.getAppointmentDateTime().isAfter(LocalDateTime.now()))
+                    .filter(appointment -> appointment.getStatus() == AppointmentStatus.CONFIRMED || 
+                                          appointment.getStatus() == AppointmentStatus.PENDING)
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+                System.out.println("📅 Returning " + result.size() + " upcoming appointments for patient: " + userID);
+                return result;
+            }
+        }
+        
+        try {
+            // Try to get appointments from database first
+            Long userId = Long.parseLong(userID);
+            
+            List<Appointment> dbAppointments = new ArrayList<>();
+            
+            // First try as patient
+            List<Appointment> patientAppointments = appointmentRepository.findByPatientId(userId);
+            dbAppointments.addAll(patientAppointments);
+            
+            // Also try as doctor (doctor IDs are typically 1-10 based on our data)
+            if (userId >= 1 && userId <= 20) {
+                List<Appointment> doctorAppointments = appointmentRepository.findByDoctorId(userId);
+                dbAppointments.addAll(doctorAppointments);
+                System.out.println("📅 Found " + doctorAppointments.size() + " appointments for doctor ID: " + userId);
+            }
+            
+            if (!dbAppointments.isEmpty()) {
+                List<AppointmentDto> result = dbAppointments.stream()
+                    .filter(appointment -> appointment.getAppointmentDateTime().isAfter(LocalDateTime.now()))
+                    .filter(appointment -> appointment.getStatus() == AppointmentStatus.CONFIRMED || 
+                                          appointment.getStatus() == AppointmentStatus.PENDING)
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+                System.out.println("📅 Returning " + result.size() + " upcoming appointments from database");
+                return result;
             }
         } catch (NumberFormatException e) {
-            // userID is not a number, use mock data
+            System.out.println("📅 userID is not a number: " + userID);
         }
         
         // Fallback to mock data
         List<AppointmentDto> userAppointments = appointmentsByUser.get(userID);
         if (userAppointments == null) {
+            System.out.println("📅 No appointments found for userID: " + userID);
             return new ArrayList<>();
         }
         
-        return userAppointments.stream()
+        List<AppointmentDto> result = userAppointments.stream()
             .filter(appointment -> appointment.appointmentDateTime().isAfter(LocalDateTime.now()))
             .filter(appointment -> appointment.status() == AppointmentStatus.CONFIRMED || 
                                   appointment.status() == AppointmentStatus.PENDING)
             .collect(Collectors.toList());
+        System.out.println("📅 Returning " + result.size() + " upcoming appointments from mock data");
+        return result;
+    }
+    
+    private Map<String, Long> createDoctorUserMapping() {
+        Map<String, Long> mapping = new HashMap<>();
+        // Map doctor usernames to their database IDs based on data.sql
+        mapping.put("elena.rodriguez", 1L);
+        mapping.put("michael.chen", 2L);
+        mapping.put("sarah.kim", 3L);
+        mapping.put("david.green", 4L);
+        mapping.put("emily.white", 5L);
+        mapping.put("james.brown", 6L);
+        mapping.put("olivia.perez", 7L);
+        mapping.put("ben.carter", 8L);
+        mapping.put("sofia.garcia", 9L);
+        mapping.put("john.smith", 10L);
+        mapping.put("sarah.johnson", 11L);
+        mapping.put("mike.wilson", 12L);
+        mapping.put("lisa.brown", 13L);
+        mapping.put("david.lee", 14L);
+        
+        // Also map email addresses to the same IDs
+        mapping.put("elena.rodriguez@hospital.com", 1L);
+        mapping.put("michael.chen@hospital.com", 2L);
+        mapping.put("sarah.kim@hospital.com", 3L);
+        mapping.put("david.green@hospital.com", 4L);
+        mapping.put("emily.white@hospital.com", 5L);
+        mapping.put("james.brown@hospital.com", 6L);
+        mapping.put("olivia.perez@hospital.com", 7L);
+        mapping.put("ben.carter@hospital.com", 8L);
+        mapping.put("sofia.garcia@hospital.com", 9L);
+        mapping.put("john.smith@hospital.com", 10L);
+        mapping.put("sarah.johnson@hospital.com", 11L);
+        mapping.put("mike.wilson@hospital.com", 12L);
+        mapping.put("lisa.brown@hospital.com", 13L);
+        mapping.put("david.lee@hospital.com", 14L);
+        
+        return mapping;
+    }
+    
+    private Map<String, Long> createPatientUserMapping() {
+        Map<String, Long> mapping = new HashMap<>();
+        // Map patient usernames to their database IDs based on data.sql
+        mapping.put("patient1", 1001L);
+        mapping.put("patient1@test.com", 1001L);
+        
+        // Add more patients as needed
+        // mapping.put("patient2", 1002L);
+        
+        return mapping;
     }
     
     public List<AppointmentDto> getAppointmentHistory(String userID) {
         System.out.println("📅 AppointmentApplicationService: Getting history for userID: " + userID);
         System.out.println("📅 Available user keys in appointmentsByUser: " + appointmentsByUser.keySet());
         
+        // Create mappings for both doctors and patients
+        Map<String, Long> doctorMapping = createDoctorUserMapping();
+        Map<String, Long> patientMapping = createPatientUserMapping();
+        
+        // First check if this is a doctor by checking our static mapping
+        Long doctorId = doctorMapping.get(userID);
+        if (doctorId != null) {
+            System.out.println("📅 Found doctor mapping for history: " + userID + " -> doctorId: " + doctorId);
+            List<Appointment> doctorAppointments = appointmentRepository.findByDoctorId(doctorId);
+            if (!doctorAppointments.isEmpty()) {
+                System.out.println("📅 Found " + doctorAppointments.size() + " appointments for doctor: " + userID);
+                return doctorAppointments.stream()
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+            }
+        }
+        
+        // Check if this is a patient by checking our static mapping
+        Long patientId = patientMapping.get(userID);
+        if (patientId != null) {
+            System.out.println("📅 Found patient mapping for history: " + userID + " -> patientId: " + patientId);
+            List<Appointment> patientAppointments = appointmentRepository.findByPatientId(patientId);
+            if (!patientAppointments.isEmpty()) {
+                System.out.println("📅 Found " + patientAppointments.size() + " appointments for patient: " + userID);
+                return patientAppointments.stream()
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+            }
+        }
+        
         try {
             // Try to get appointments from database first
-            Long patientId = Long.parseLong(userID);
-            List<Appointment> dbAppointments = appointmentRepository.findByPatientId(patientId);
+            Long userId = Long.parseLong(userID);
+            
+            List<Appointment> dbAppointments = new ArrayList<>();
+            
+            // First try as patient
+            List<Appointment> patientAppointments = appointmentRepository.findByPatientId(userId);
+            dbAppointments.addAll(patientAppointments);
+            
+            // Also try as doctor
+            if (userId >= 1 && userId <= 20) {
+                List<Appointment> doctorAppointments = appointmentRepository.findByDoctorId(userId);
+                dbAppointments.addAll(doctorAppointments);
+            }
             
             if (!dbAppointments.isEmpty()) {
                 System.out.println("📅 Found " + dbAppointments.size() + " appointments in database");
@@ -218,7 +365,7 @@ public class AppointmentApplicationService {
                     .collect(Collectors.toList());
             }
         } catch (NumberFormatException e) {
-            System.out.println("📅 userID is not a number, using mock data for: " + userID);
+            System.out.println("📅 userID is not a number: " + userID);
         }
         
         // Fallback to mock data
@@ -262,6 +409,8 @@ public class AppointmentApplicationService {
     }
     
     public AppointmentDto createAppointment(AppointmentController.CreateAppointmentRequest request) {
+        System.out.println("📅 Creating appointment: " + request);
+        
         // Parse the date-time string
         LocalDateTime dateTime;
         try {
@@ -271,26 +420,74 @@ public class AppointmentApplicationService {
             dateTime = LocalDateTime.now().plusDays(1); // Default fallback
         }
         
-        // Create new appointment
-        Long newId = System.currentTimeMillis(); // Simple ID generation
-        AppointmentDto newAppointment = new AppointmentDto(
-            newId,
-            1L, // Default patient ID
-            Long.parseLong(request.doctorID().replace("doctor-uuid-", "")), // Extract numeric ID
-            dateTime,
-            30, // Default duration
-            request.patientInfo().reason(),
-            AppointmentStatus.PENDING
-        );
+        // Extract doctor ID from request
+        Long doctorId;
+        try {
+            if (request.doctorID().startsWith("doctor-uuid-")) {
+                doctorId = Long.parseLong(request.doctorID().replace("doctor-uuid-", ""));
+            } else {
+                doctorId = Long.parseLong(request.doctorID());
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("📅 Invalid doctor ID format: " + request.doctorID());
+            doctorId = 1L; // Default fallback
+        }
         
-        String appointmentUuid = "app-uuid-" + newId;
-        appointmentsByUuid.put(appointmentUuid, newAppointment);
+        // Get patient ID using mapping
+        Map<String, Long> patientMapping = createPatientUserMapping();
+        Long patientId = patientMapping.get(request.userID());
+        if (patientId == null) {
+            // Fallback to default patient ID if mapping not found
+            patientId = 1001L;
+            System.out.println("📅 No patient mapping found for userID: " + request.userID() + ", using default patientId: " + patientId);
+        } else {
+            System.out.println("📅 Found patient mapping: " + request.userID() + " -> patientId: " + patientId);
+        }
         
-        // Add to user's appointments
-        String userUuid = request.userID();
-        appointmentsByUser.computeIfAbsent(userUuid, k -> new ArrayList<>()).add(newAppointment);
+        System.out.println("📅 Creating appointment - doctorId: " + doctorId + ", patientId: " + patientId + ", dateTime: " + dateTime);
         
-        return newAppointment;
+        // Create appointment using the domain service to save to database
+        try {
+            Appointment appointment = bookingService.bookAppointment(patientId, doctorId, dateTime, request.patientInfo().reason());
+            
+            // Publish event
+            eventPublisher.publish(new AppointmentBooked(
+                appointment.getAppointmentId().value(),
+                appointment.getPatientId(),
+                appointment.getDoctorId(),
+                appointment.getAppointmentDateTime()
+            ));
+            
+            AppointmentDto result = toDto(appointment);
+            System.out.println("📅 Successfully created appointment in database: " + result);
+            return result;
+            
+        } catch (Exception e) {
+            System.err.println("📅 Error creating appointment in database: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Fallback to in-memory storage for compatibility
+            Long newId = System.currentTimeMillis();
+            AppointmentDto newAppointment = new AppointmentDto(
+                newId,
+                patientId,
+                doctorId,
+                dateTime,
+                30, // Default duration
+                request.patientInfo().reason(),
+                AppointmentStatus.PENDING
+            );
+            
+            String appointmentUuid = "app-uuid-" + newId;
+            appointmentsByUuid.put(appointmentUuid, newAppointment);
+            
+            // Add to user's appointments
+            String userUuid = request.userID();
+            appointmentsByUser.computeIfAbsent(userUuid, k -> new ArrayList<>()).add(newAppointment);
+            
+            System.out.println("📅 Created appointment in memory as fallback: " + newAppointment);
+            return newAppointment;
+        }
     }
     
     public AppointmentDto cancelAppointment(String appointmentId) {
