@@ -33,12 +33,42 @@ export class AppointmentBookingComponent implements OnInit {
     reviews: 230,
     avatar: 'assets/avatars/2.jpg',
   });
-  
+
   isLoading = signal(false);
+  isViewMode = signal(false);
+  viewingAppointment = signal<AppointmentModel | null>(null);
 
   ngOnInit(): void {
+    this.checkViewMode();
     this.loadDoctorInfo();
     this.loadPatientInfo();
+  }
+
+  private checkViewMode(): void {
+    const appointmentId = this.route.snapshot.queryParams['appointmentId'];
+    const viewMode = this.route.snapshot.queryParams['viewMode'];
+    
+    if (appointmentId && viewMode === 'true') {
+      this.isViewMode.set(true);
+      this.loadAppointmentForView(appointmentId);
+    }
+  }
+
+  private loadAppointmentForView(appointmentId: string): void {
+    const user = this.authService.getCurrentUser();
+    if (!user) return;
+
+    this.appointmentService.getAllAppointments(user.uuid).subscribe({
+      next: (appointments) => {
+        const appointment = appointments.find(apt => apt.uuid === appointmentId);
+        if (appointment) {
+          this.viewingAppointment.set(appointment);
+          const [dateStr, , timeStr] = appointment.dateTime.split(' ');
+          this.date.set(dateStr);
+          this.chosenSlot.set(timeStr);
+        }
+      }
+    });
   }
 
   private loadPatientInfo(): void {
@@ -93,20 +123,20 @@ export class AppointmentBookingComponent implements OnInit {
     agree: [false, [Validators.requiredTrue]],
   });
 
-  canSubmit = computed(() => !!this.date() && !!this.chosenSlot() && this.form.valid);
+  canSubmit = computed(() => !!this.date() && !!this.chosenSlot());
 
   pickDate(e: Event) {
     const input = e.target as HTMLInputElement;
     const selectedDate = input.value;
     this.date.set(selectedDate);
-    
+
     if (selectedDate && this.doctor().doctorID) {
       this.loadTimeSlots(this.doctor().doctorID, selectedDate);
     }
   }
-  
+
   pickSlot(v: string) { this.chosenSlot.set(v); }
-  
+
   private loadTimeSlots(doctorID: string, date: string): void {
     this.scheduleService.getDoctorSchedule(doctorID, date).subscribe({
       next: (schedule) => {
@@ -128,13 +158,13 @@ export class AppointmentBookingComponent implements OnInit {
 
   submit() {
     if (!this.canSubmit()) { this.form.markAllAsTouched(); return; }
-    
+
     const user = this.authService.getCurrentUser();
     if (!user) return;
 
     const formData = this.form.getRawValue();
     const doctorInfo = this.doctor();
-    
+
     // Create new appointment
     const newAppointment = new AppointmentModel(
       'apt-' + Date.now(),
@@ -149,7 +179,7 @@ export class AppointmentBookingComponent implements OnInit {
     );
 
     this.isLoading.set(true);
-    
+
     // Book the time slot first
     this.scheduleService.bookTimeSlot(doctorInfo.doctorID, this.date(), this.chosenSlot()).subscribe({
       next: (success) => {

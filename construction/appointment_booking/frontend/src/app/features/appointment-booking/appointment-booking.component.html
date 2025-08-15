@@ -12,7 +12,7 @@
   </div>
 </section>
 
-<section class="card">
+<section class="card" *ngIf="!isViewMode()">
   <h2>Select Date & Time</h2>
   <div class="datetime">
     <div class="date">
@@ -38,25 +38,33 @@
   </div>
 </section>
 
+<section class="card" *ngIf="isViewMode()">
+  <h2>Appointment Details</h2>
+  <div class="appointment-info">
+    <p><strong>Date & Time:</strong> {{ date() }} at {{ chosenSlot() }}</p>
+    <p><strong>Status:</strong> {{ viewingAppointment()?.status }}</p>
+  </div>
+</section>
+
 <section class="card">
   <h2>Patient Information</h2>
   <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="grid">
       <div class="field">
         <label>Full Name</label>
-        <input formControlName="fullName" placeholder="John Doe" />
+        <input formControlName="fullName" placeholder="John Doe" [readonly]="isViewMode()" />
       </div>
       <div class="field">
         <label>Email Address</label>
-        <input type="email" formControlName="email" placeholder="john.doe@example.com" />
+        <input type="email" formControlName="email" placeholder="john.doe@example.com" [readonly]="isViewMode()" />
       </div>
       <div class="field">
         <label>Phone Number</label>
-        <input formControlName="phone" placeholder="+1 (555) 123-4567" />
+        <input formControlName="phone" placeholder="+1 (555) 123-4567" [readonly]="isViewMode()" />
       </div>
       <div class="field">
         <label>Gender</label>
-        <select formControlName="gender">
+        <select formControlName="gender" [disabled]="isViewMode()">
           <option value="">Select gender</option>
           <option>Male</option>
           <option>Female</option>
@@ -65,22 +73,22 @@
       </div>
       <div class="field full">
         <label>Reason for Visit</label>
-        <textarea rows="4" formControlName="reason" placeholder="Briefly describe your symptoms or reason for the visit..."></textarea>
+        <textarea rows="4" formControlName="reason" placeholder="Briefly describe your symptoms or reason for the visit..." [readonly]="isViewMode()"></textarea>
       </div>
       <div class="field">
         <label>Insurance Provider (Optional)</label>
-        <input formControlName="insurance" placeholder="e.g., Blue Cross Blue Shield" />
+        <input formControlName="insurance" placeholder="e.g., Blue Cross Blue Shield" [readonly]="isViewMode()" />
       </div>
       <div class="field">
         <label>Policy Number (Optional)</label>
-        <input formControlName="policyNumber" placeholder="XXXX-XXXX-XXXX" />
+        <input formControlName="policyNumber" placeholder="XXXX-XXXX-XXXX" [readonly]="isViewMode()" />
       </div>
       <div class="field full chk">
-        <label><input type="checkbox" formControlName="agree" /> I agree to the <a href="#">terms and conditions</a>.</label>
+        <label *ngIf="!isViewMode()"><input type="checkbox" formControlName="agree" /> I agree to the <a href="#">terms and conditions</a>.</label>
       </div>
     </div>
 
-    <div class="actions">
+    <div class="actions" *ngIf="!isViewMode()">
       <button type="submit" class="btn primary" [disabled]="!canSubmit()">Confirm Booking</button>
     </div>
   </form>

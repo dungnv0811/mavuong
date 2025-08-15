@@ -34,7 +34,7 @@
       </div>
       <div class="ta actions">
         <button class="link" (click)="view(it)">View</button>
-        <button class="link" (click)="reschedule(it)" *ngIf="it.status!==AppointmentStatus.CANCELLED">Reschedule</button>
+
         <button class="link danger" (click)="cancel(it)" *ngIf="it.status===AppointmentStatus.UPCOMING">Cancel</button>
       </div>
     </div>

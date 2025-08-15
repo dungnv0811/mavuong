@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AppointmentModel, UserModel, AppointmentStatus } from '../../shared/models/booking-docter-models';
 import { DEFAULT_AVATAR_MALE, DEFAULT_AVATAR_FEMALE } from '../constants/common.constants';
 import { AuthService } from '../../core/auth/auth.service';
@@ -17,6 +18,7 @@ import { UserService } from '../../core/services/user.service';
 })
 export class ProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private router = inject(Router);
   private authService = inject(AuthService);
   private appointmentService = inject(AppointmentService);
   private scheduleService = inject(ScheduleService);
@@ -58,7 +60,7 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  avatarUrl = signal('assets/avatars/me.jpg'); // đổi thành ảnh của bạn
+  avatarUrl = signal(DEFAULT_AVATAR_MALE); // đổi thành ảnh của bạn
 
   form = this.fb.group({
     firstName: ['', [Validators.required]],
@@ -117,8 +119,14 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  view(item: AppointmentModel) { alert('View appointment: ' + item.doctor); }
-  reschedule(item: AppointmentModel) { alert('Reschedule: ' + item.doctor); }
+  view(item: AppointmentModel) {
+    this.router.navigate(['/appointment-booking'], {
+      queryParams: {
+        appointmentId: item.uuid,
+        viewMode: 'true'
+      }
+    });
+  }
 
   cancel(item: AppointmentModel) {
     if (confirm('Are you sure you want to cancel this appointment?')) {
