@@ -3,6 +3,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { UserModel } from '../../shared/models/booking-docter-models';
 import {UserService} from "../services/user.service";
+import {Router} from "@angular/router";
 
 declare const google: any;
 
@@ -14,7 +15,9 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserModel | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor() {
+  constructor(
+      private router: Router
+  ) {
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('user');
       if (savedUser) {
@@ -51,16 +54,17 @@ export class AuthService {
     this.userService.getUserByEmailOrName(user.email).subscribe({
       next: (existingUser) => {
         const userToLogin = existingUser || user;
-        
+
         // If user doesn't exist, create new one
         if (!existingUser) {
           this.userService.createUser(user).subscribe();
         }
-        
+
         this.currentUserSubject.next(userToLogin);
         if (typeof window !== 'undefined') {
           localStorage.setItem('user', JSON.stringify(userToLogin));
         }
+        this.router.navigate(['health-connect']);
       },
       error: () => {
         // Fallback: use provided user

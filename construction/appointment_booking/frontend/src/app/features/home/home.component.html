@@ -1,72 +1,67 @@
+<!-- Header -->
+<header class="hc-header">
+  <div class="container header-inner">
+    <div class="logo">HealthConnect</div>
+    <div class="auth">
+      <a class="btn btn-outline" routerLink="/login">Login</a>
+      <a class="btn btn-primary" routerLink="/login">Sign Up</a>
+    </div>
+  </div>
+</header>
+
 <!-- Hero -->
 <section class="hero">
-  <div class="hero-inner">
+  <div class="container hero-inner">
     <div class="hero-text">
-      <h1>AI-DLC Healthcare Platform</h1>
+      <h1>Your Health, Simplified. Book Appointments with Ease.</h1>
       <p class="lead">
-        Tìm bác sĩ, đặt lịch nhanh, quản lý hồ sơ sức khỏe – tất cả trong một nơi.
+        HealthConnect offers a seamless way to manage your healthcare. Find trusted doctors, schedule visits, and
+        access your health profile — all in one secure place.
       </p>
-      <div class="cta">
-        <a class="btn primary" routerLink="/doctors">Tìm bác sĩ ngay</a>
-        <a class="btn ghost" routerLink="/dashboard">Xem Dashboard</a>
-      </div>
-      <div class="trust">
-        <img src="/assets/images/male_avatar_default.png" alt="trust" />
-        <span>Được tin dùng bởi hàng ngàn bệnh nhân</span>
-      </div>
     </div>
-    <div class="hero-card">
-      <div class="mini-card">
-        <div class="title">Đặt lịch trong 30s</div>
-        <p class="muted">Chọn ngày, chọn giờ, xác nhận – đơn giản.</p>
-      </div>
-      <div class="mini-card">
-        <div class="title">Bác sĩ uy tín</div>
-        <p class="muted">Hệ thống bác sĩ nhiều chuyên khoa.</p>
-      </div>
-      <div class="mini-card">
-        <div class="title">Hồ sơ sức khỏe</div>
-        <p class="muted">Quản lý lịch sử khám ngay trên dashboard.</p>
-      </div>
+    <div class="hero-art">
+      <!-- Đặt đúng ảnh vào /src/assets/images/hero-illustration.png -->
+      <img src="/assets/images/hero-illustration.png" alt="Booking Illustration" />
     </div>
   </div>
 </section>
 
-<!-- Features -->
-<section class="features">
-  <h2>Tính năng nổi bật</h2>
-  <div class="grid">
-    <article class="feature">
-      <div class="icon">🗓️</div>
-      <h3>Đặt lịch thông minh</h3>
-      <p class="muted">Gợi ý khung giờ phù hợp lịch cá nhân.</p>
-      <a routerLink="/book-appointment" class="link">Đặt lịch ngay →</a>
-    </article>
-    <article class="feature">
-      <div class="icon">👩‍⚕️</div>
-      <h3>Danh sách bác sĩ</h3>
-      <p class="muted">Lọc theo chuyên khoa, rating, vị trí.</p>
-      <a routerLink="/doctors" class="link">Xem danh sách →</a>
-    </article>
-    <article class="feature">
-      <div class="icon">📂</div>
-      <h3>Hồ sơ cá nhân</h3>
-      <p class="muted">Cập nhật thông tin, lịch sử hẹn.</p>
-      <a routerLink="/profile" class="link">Quản lý hồ sơ →</a>
-    </article>
+<!-- Why choose -->
+<section class="why">
+  <div class="container">
+    <h2>Why Choose HealthConnect?</h2>
+    <div class="cards">
+      <article class="card">
+        <div class="icon">📅</div>
+        <h3>Effortless Booking</h3>
+        <p>Schedule appointments in a few taps with real‑time availability.</p>
+      </article>
+      <article class="card">
+        <div class="icon">✔️</div>
+        <h3>Verified Professionals</h3>
+        <p>Access a network of vetted and highly‑rated medical specialists.</p>
+      </article>
+      <article class="card">
+        <div class="icon">🗂️</div>
+        <h3>Personalized Health Profile</h3>
+        <p>Securely manage records, prescriptions, and appointment history.</p>
+      </article>
+    </div>
   </div>
 </section>
 
-<!-- Call to action -->
-<section class="cta-strip">
-  <div class="strip-inner">
-    <div>
-      <h3>Sẵn sàng cải thiện trải nghiệm khám bệnh?</h3>
-      <p class="muted">Đăng nhập để đồng bộ dữ liệu và nhận nhắc lịch.</p>
-    </div>
-    <div class="actions">
-      <a class="btn primary" routerLink="/dashboard">Vào Dashboard</a>
-      <a class="btn" routerLink="/doctors">Tìm bác sĩ</a>
+<!-- FAQ -->
+<section class="faq">
+  <div class="container">
+    <h2>Common Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item" *ngFor="let f of faqs; index as i">
+        <button class="faq-q" type="button" (click)="toggleFaq(i)">
+          {{ f.q }}
+          <span class="sign">{{ openIndex === i ? '−' : '+' }}</span>
+        </button>
+        <div class="faq-a" *ngIf="openIndex === i">{{ f.a }}</div>
+      </div>
     </div>
   </div>
 </section>

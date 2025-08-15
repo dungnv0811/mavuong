@@ -27,9 +27,9 @@ export class ShellComponent {
   navigateToProfile(): void {
     const user = this.authService.getCurrentUser();
     if (user?.userRole === 'doctor') {
-      this.router.navigate(['/doctor/profile']);
+      this.router.navigate(['/health-connect/doctor/profile']);
     } else {
-      this.router.navigate(['/profile']);
+      this.router.navigate(['/health-connect/profile']);
     }
   }
 

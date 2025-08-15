@@ -3,11 +3,10 @@
   <header class="topbar">
     <div class="brand">
       <img src="{{ DEFAULT_LOGO }}" alt="logo" height="40" />
-      <span>FAKE HOSPITAL</span>
     </div>
     <nav class="topnav">
-      <a class="item" routerLink="/" routerLinkActive="active" *ngIf="authService.isAuthenticated()"><span class="dot"></span> Dashboard</a>
-      <a class="item" routerLink="/doctors" routerLinkActive="active" *ngIf="authService.isAuthenticated() && !isDoctorUser()"><span class="dot"></span> Doctor Listing</a>
+      <a class="item" routerLink="/health-connect/dashboard" routerLinkActive="active" *ngIf="authService.isAuthenticated()"><span class="dot"></span> Dashboard</a>
+      <a class="item" routerLink="/health-connect/doctors" routerLinkActive="active" *ngIf="authService.isAuthenticated() && !isDoctorUser()"><span class="dot"></span> Doctor Listing</a>
       <a class="item" (click)="navigateToProfile()" style="cursor: pointer" *ngIf="authService.isAuthenticated()"><span class="dot"></span> My Profile</a>
     </nav>
     <div class="top-actions">
@@ -21,8 +20,8 @@
   <div class="body">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <a class="item" routerLink="/" routerLinkActive="active" *ngIf="authService.isAuthenticated()"><span><i class="fa fa-th"></i>Dashboard</span></a>
-      <a class="item" routerLink="/doctors" routerLinkActive="active" *ngIf="authService.isAuthenticated() && !isDoctorUser()"><span><i class="fa fa-stethoscope"></i>Doctor Listing</span></a>
+      <a class="item" routerLink="/health-connect/dashboard" routerLinkActive="active" *ngIf="authService.isAuthenticated()"><span><i class="fa fa-th"></i>Dashboard</span></a>
+      <a class="item" routerLink="/health-connect/doctors" routerLinkActive="active" *ngIf="authService.isAuthenticated() && !isDoctorUser()"><span><i class="fa fa-stethoscope"></i>Doctor Listing</span></a>
       <a class="item" (click)="navigateToProfile()" style="cursor: pointer" *ngIf="authService.isAuthenticated()"><span><i class="fa fa-user"></i>Profile</span></a>
     </aside>
 

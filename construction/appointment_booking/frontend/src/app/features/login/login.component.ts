@@ -15,8 +15,8 @@ declare const google: any;
   template: `
     <div class="login-container">
       <div class="login-card">
-        <img src="{{ DEFAULT_LOGO }}" alt="logo" height="80" />
-        <h2 class="text-center mb-4">{{ isSignupMode ? 'Create Account' : 'Welcome to HealthApp' }}</h2>
+        <img src="{{ DEFAULT_LOGO }}" alt="logo" height="40" />
+        <h2 class="text-center mb-4">{{ isSignupMode ? 'Create Account' : 'Welcome to HealthConnect' }}</h2>
 
         <!-- Login/Signup Form -->
         <form (ngSubmit)="isSignupMode ? signup() : loginWithPassword()" class="mb-4">
@@ -195,7 +195,7 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     this.authService.login(this.username, this.password).subscribe({
       next: (user) => {
-        this.router.navigate(['']);
+        this.router.navigate(['health-connect']);
         this.isLoading = false;
       },
       error: () => {
@@ -261,7 +261,7 @@ export class LoginComponent implements OnInit {
       'patient'
     );
     this.authService.loginWithGoogle(user);
-    this.router.navigate(['']);
+
   }
 
   protected readonly DEFAULT_LOGO = DEFAULT_LOGO;
