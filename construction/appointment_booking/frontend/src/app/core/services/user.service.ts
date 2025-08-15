@@ -1,14 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, map, catchError } from 'rxjs/operators';
 import { UserModel } from '../../shared/models/booking-docter-models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl;
   
   private mockUsers: { [key: string]: UserModel } = {
+    // Backend Demo Users (matching backend AuthService)
+    'patient1': new UserModel('patient1-uuid', 'patient1', 'John', 'Doe', 'patient1@test.com', '+1234567890', '1990-01-01', '123 Main St', 'patient'),
+    'doctor1': new UserModel('doctor1-uuid', 'doctor1', 'Dr. Jane', 'Smith', 'doctor1@test.com', '+1234567891', '1980-05-15', '456 Medical Ave', 'doctor'),
+    
     // Doctor Users (based on mockDoctorProfiles)
     'doc-001': new UserModel('doc-001', 'elena.rodriguez', 'Elena', 'Rodriguez', 'elena.rodriguez@hospital.com', '(555) 001-0001', '1978-03-15', '123 Medical Plaza, Boston, MA 02115', 'doctor'),
     'doc-002': new UserModel('doc-002', 'michael.chen', 'Michael', 'Chen', 'michael.chen@hospital.com', '(555) 002-0002', '1982-07-22', '456 Stanford Ave, Palo Alto, CA 94301', 'doctor'),
@@ -26,8 +34,31 @@ export class UserService {
   };
 
   getUserById(userUuid: string): Observable<UserModel | null> {
-    const user = this.mockUsers[userUuid] || null;
-    return of(user).pipe(delay(500));
+    console.log('👤 Getting user by ID:', userUuid);
+    
+    return this.http.get<any>(`${this.baseUrl}/users/${userUuid}`).pipe(
+      map((response: any) => {
+        console.log('👤 Backend user response:', response);
+        const userData = response.user || response;
+        
+        return new UserModel(
+          userData.uuid || userUuid,
+          userData.username,
+          userData.firstName,
+          userData.lastName,
+          userData.email,
+          userData.phone,
+          userData.dob,
+          userData.address,
+          userData.userRole?.toLowerCase() || userData.userRole
+        );
+      }),
+      catchError((error) => {
+        console.warn('👤 Backend call failed for user, using mock data:', error);
+        const user = this.mockUsers[userUuid] || null;
+        return of(user).pipe(delay(500));
+      })
+    );
   }
 
   getAllUsers(): Observable<UserModel[]> {
@@ -61,5 +92,32 @@ export class UserService {
       `${u.firstName} ${u.lastName}`.toLowerCase() === emailOrName.toLowerCase()
     );
     return of(user || null).pipe(delay(500));
+  }
+
+  updateUserProfile(userUuid: string, profileData: any): Observable<UserModel | null> {
+    console.log('👤 Updating user profile:', userUuid, profileData);
+
+    return this.http.put<any>(`${this.baseUrl}/users/${userUuid}/profile`, profileData).pipe(
+      map((response: any) => {
+        console.log('👤 Backend profile update response:', response);
+        const userData = response.user || response;
+
+        return new UserModel(
+          userData.uuid || userUuid,
+          userData.username,
+          userData.firstName,
+          userData.lastName,
+          userData.email,
+          userData.phone,
+          userData.dob,
+          userData.address,
+          userData.userRole?.toLowerCase() || userData.userRole
+        );
+      }),
+      catchError((error) => {
+        console.warn('👤 Backend call failed for profile update:', error);
+        return of(null);
+      })
+    );
   }
 }

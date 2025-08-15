@@ -1,5 +1,7 @@
 server:
-  port: 8080
+  port: 8090
+  servlet:
+    context-path: /api/v1
 
 spring:
   datasource:
@@ -28,4 +30,4 @@ security:
     issuer-uri: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_example
     enabled: false
   jwt:
-    enabled: true
+    enabled: false

@@ -31,9 +31,10 @@ export class DashboardComponent implements OnInit {
     if (!user?.uuid) return;
 
     this.isLoading.set(true);
-    this.appointmentService.getUpcomingAppointments(user.uuid).subscribe({
-      next: (appointments) => {
-        this.upcoming.set(appointments);
+    // Use paginated method but just get the first 5 appointments for dashboard
+    this.appointmentService.getUpcomingAppointmentsPaginated(user.uuid, 0, 5).subscribe({
+      next: (response) => {
+        this.upcoming.set(response.appointments);
         this.isLoading.set(false);
       },
       error: () => {

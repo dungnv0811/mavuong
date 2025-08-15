@@ -1,29 +1,88 @@
 <h1>Find Your Doctor</h1>
-<div class="filters">
-  <input placeholder="Search by name or specialty…" [(ngModel)]="searchTerm" (input)="filterDoctors()" />
+
+<!-- Loading indicator -->
+<div *ngIf="isLoading()" class="loading">
+  <p>Loading doctors...</p>
+</div>
+
+<div class="filters" *ngIf="!isLoading()">
+  <div class="search-row">
+    <input placeholder="Search by name or specialty…" [(ngModel)]="searchTerm" (input)="filterDoctors()" />
+    <select [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange()">
+      <option value="">All Specialties</option>
+      <option *ngFor="let specialty of specialties" [value]="specialty">{{ specialty }}</option>
+    </select>
+  </div>
+  
   <div class="filter-buttons">
-    <button (click)="sortBy('specialty')">Specialty</button>
-    <button (click)="sortBy('rating')">Rating</button>
-    <button (click)="sortBy('nextAvailable')">Availability</button>
-    <button (click)="sortBy('name')">Location</button>
+    <label>Sort by:</label>
+    <select [(ngModel)]="sortBy" (change)="onSortChange()">
+      <option value="name">Name</option>
+      <option value="specialty">Specialty</option>
+      <option value="rating">Rating</option>
+    </select>
+    <select [(ngModel)]="sortDir" (change)="onSortChange()">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
   </div>
 </div>
 
-<div class="grid">
-  <article class="card" *ngFor="let doc of filteredDoctors()">
+<!-- Results summary -->
+<div class="results-info" *ngIf="!isLoading()">
+  <p>
+    Showing {{ doctors().length }} of {{ totalElements() }} doctors
+    <span *ngIf="searchTerm || selectedSpecialty"> 
+      (filtered by {{ searchTerm ? '"' + searchTerm + '"' : '' }}{{ searchTerm && selectedSpecialty ? ' and ' : '' }}{{ selectedSpecialty ? selectedSpecialty : '' }})
+    </span>
+  </p>
+</div>
+
+<div class="grid" *ngIf="!isLoading()">
+  <article class="card" *ngFor="let doc of doctors()">
     <img class="avatar" [src]="doc.avatar" alt="{{doc.name}}" />
     <h2>{{ doc.name }}</h2>
     <p class="specialty">{{ doc.specialty }}</p>
-    <p class="rating">⭐ {{ doc.rating }} ({{ doc.reviews }})</p>
+    <p class="rating">⭐ {{ doc.rating }} ({{ doc.reviews }} reviews)</p>
     <p class="next">Next Available: {{ doc.nextAvailable }}</p>
     <button class="btn primary" (click)="bookAppointment(doc)">Book Appointment</button>
   </article>
 </div>
 
-<div class="pagination">
-  <button>Previous</button>
-  <button class="active">1</button>
-  <button>2</button>
-  <button>3</button>
-  <button>Next</button>
+<!-- No results message -->
+<div *ngIf="!isLoading() && doctors().length === 0" class="no-results">
+  <p>No doctors found matching your criteria.</p>
+</div>
+
+<!-- Pagination -->
+<div class="pagination" *ngIf="!isLoading() && totalPages() > 1">
+  <button 
+    [disabled]="!hasPrevious()" 
+    (click)="previousPage()"
+    class="btn"
+  >
+    Previous
+  </button>
+  
+  <button 
+    *ngFor="let page of getPageNumbers()" 
+    [class.active]="page === currentPage()"
+    (click)="goToPage(page)"
+    class="btn page-btn"
+  >
+    {{ page + 1 }}
+  </button>
+  
+  <button 
+    [disabled]="!hasNext()" 
+    (click)="nextPage()"
+    class="btn"
+  >
+    Next
+  </button>
+</div>
+
+<!-- Pagination info -->
+<div class="pagination-info" *ngIf="!isLoading() && totalPages() > 1">
+  <p>Page {{ currentPage() + 1 }} of {{ totalPages() }}</p>
 </div>

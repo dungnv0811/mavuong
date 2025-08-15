@@ -1,14 +1,16 @@
 package com.healthapp.appointment.web.controller;
 
+import com.healthapp.appointment.application.dto.UserDto;
 import com.healthapp.appointment.web.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Authentication", description = "User authentication and authorization operations")
 public class AuthController {
@@ -20,24 +22,35 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    @Operation(summary = "User login", description = "Authenticate user with username and password to get JWT token")
+    @Operation(summary = "User login", description = "Authenticate user with email/username and password to get JWT token")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         try {
-            String token = authService.authenticate(request.username(), request.password());
-            return ResponseEntity.ok(new LoginResponse(token, "Login successful", request.username()));
+            AuthResult result = authService.authenticateWithUserInfo(request.emailOrUsername(), request.password());
+            return ResponseEntity.ok(new LoginResponse(result.user(), result.token()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new LoginResponse(null, "Invalid credentials", null));
+            return ResponseEntity.badRequest().build();
         }
     }
     
-    @PostMapping("/register")
-    @Operation(summary = "Register new user", description = "Register a new user with username, password and role")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+    @PostMapping("/signup")
+    @Operation(summary = "User registration", description = "Register a new user with complete profile information")
+    public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
         try {
-            authService.register(request.username(), request.password(), request.role());
-            return ResponseEntity.ok(new RegisterResponse("User registered successfully"));
+            AuthResult result = authService.registerWithFullProfile(request);
+            return ResponseEntity.ok(new SignupResponse(result.user(), result.token()));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new RegisterResponse("Registration failed: " + e.getMessage()));
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @PostMapping("/google")
+    @Operation(summary = "Google OAuth login", description = "Authenticate using Google OAuth token")
+    public ResponseEntity<GoogleLoginResponse> googleLogin(@RequestBody GoogleLoginRequest request) {
+        try {
+            // For now, return placeholder - implement Google OAuth later
+            return ResponseEntity.ok(new GoogleLoginResponse(null, "Google login not implemented yet"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
     
@@ -80,10 +93,28 @@ public class AuthController {
         }
     }
     
-    public record LoginRequest(String username, String password) {}
-    public record LoginResponse(String token, String message, String username) {}
-    public record RegisterRequest(String username, String password, String role) {}
-    public record RegisterResponse(String message) {}
+    // Request/Response records for frontend compatibility
+    public record LoginRequest(String emailOrUsername, String password) {}
+    public record LoginResponse(UserDto user, String token) {}
+    
+    public record SignupRequest(
+        String username,
+        String firstName,
+        String lastName,
+        String email,
+        String phone,
+        LocalDate dob,
+        String address,
+        String userRole,
+        String password
+    ) {}
+    public record SignupResponse(UserDto user, String token) {}
+    
+    public record GoogleLoginRequest(String googleToken) {}
+    public record GoogleLoginResponse(UserDto user, String token) {}
+    
     public record UserResponse(String username, String role) {}
     public record DebugResponse(String username, String roleFromToken, String roleFromUser, boolean tokenValid, String tokenPreview) {}
+    
+    public record AuthResult(UserDto user, String token) {}
 }

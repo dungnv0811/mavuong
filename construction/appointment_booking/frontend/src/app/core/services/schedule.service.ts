@@ -1,12 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { delay, map, catchError } from 'rxjs/operators';
 import { DoctorScheduleModel, TimeSlot } from '../../shared/models/schedule.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScheduleService {
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl;
   
   private mockBookedSlots: { [key: string]: string[] } = {
     // Format: 'doctorID-date': ['time1', 'time2']
@@ -40,41 +44,62 @@ export class ScheduleService {
   }
 
   getDoctorSchedule(doctorID: string, date: string): Observable<DoctorScheduleModel> {
-    const availableTimes = this.getAvailableTimesForDate(date);
-    const key = `${doctorID}-${date}`;
-    const bookedTimes = this.mockBookedSlots[key] || [];
+    console.log('📅 Getting doctor schedule for:', doctorID, 'on', date);
     
-    const currentDateTime = new Date();
-    const selectedDate = new Date(date);
-    const isToday = selectedDate.toDateString() === currentDateTime.toDateString();
-
-    const timeSlots: TimeSlot[] = availableTimes.map(time => {
-      let isDisabled = false;
-      let isBooked = bookedTimes.includes(time);
-      
-      if (isToday) {
-        const [timeStr, period] = time.split(' ');
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        let hour24 = hours;
+    return this.http.get<any>(`${this.baseUrl}/schedules/${doctorID}?date=${date}`).pipe(
+      map((response: any) => {
+        console.log('📅 Backend schedule response:', response);
         
-        if (period === 'PM' && hours !== 12) hour24 += 12;
-        if (period === 'AM' && hours === 12) hour24 = 0;
+        const schedule = response.schedule || response;
+        const timeSlots: TimeSlot[] = schedule.timeSlots?.map((slot: any) => ({
+          time: slot.time,
+          isBooked: slot.isBooked || false,
+          isDisabled: slot.isDisabled || false
+        })) || [];
         
-        const slotDateTime = new Date(selectedDate);
-        slotDateTime.setHours(hour24, minutes, 0, 0);
+        return new DoctorScheduleModel(doctorID, date, timeSlots);
+      }),
+      catchError((error) => {
+        console.warn('📅 Backend call failed for schedule, using mock data:', error);
         
-        isDisabled = slotDateTime <= currentDateTime;
-      }
+        // Fallback to mock schedule logic
+        const availableTimes = this.getAvailableTimesForDate(date);
+        const key = `${doctorID}-${date}`;
+        const bookedTimes = this.mockBookedSlots[key] || [];
+        
+        const currentDateTime = new Date();
+        const selectedDate = new Date(date);
+        const isToday = selectedDate.toDateString() === currentDateTime.toDateString();
 
-      return {
-        time,
-        isBooked,
-        isDisabled
-      };
-    });
+        const timeSlots: TimeSlot[] = availableTimes.map(time => {
+          let isDisabled = false;
+          let isBooked = bookedTimes.includes(time);
+          
+          if (isToday) {
+            const [timeStr, period] = time.split(' ');
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            let hour24 = hours;
+            
+            if (period === 'PM' && hours !== 12) hour24 += 12;
+            if (period === 'AM' && hours === 12) hour24 = 0;
+            
+            const slotDateTime = new Date(selectedDate);
+            slotDateTime.setHours(hour24, minutes, 0, 0);
+            
+            isDisabled = slotDateTime <= currentDateTime;
+          }
 
-    const schedule = new DoctorScheduleModel(doctorID, date, timeSlots);
-    return of(schedule).pipe(delay(500));
+          return {
+            time,
+            isBooked,
+            isDisabled
+          };
+        });
+
+        const schedule = new DoctorScheduleModel(doctorID, date, timeSlots);
+        return of(schedule).pipe(delay(500));
+      })
+    );
   }
 
   bookTimeSlot(doctorID: string, date: string, time: string): Observable<boolean> {

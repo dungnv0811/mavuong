@@ -6,6 +6,7 @@ import { DEFAULT_AVATAR_MALE, DEFAULT_AVATAR_FEMALE } from '../constants/common.
 import { AuthService } from '../../core/auth/auth.service';
 import { AppointmentService } from '../../core/services/appointment.service';
 import { ScheduleService } from '../../core/services/schedule.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -19,6 +20,7 @@ export class ProfileComponent implements OnInit {
   private authService = inject(AuthService);
   private appointmentService = inject(AppointmentService);
   private scheduleService = inject(ScheduleService);
+  private userService = inject(UserService);
 
   AppointmentStatus = AppointmentStatus;
 
@@ -30,9 +32,10 @@ export class ProfileComponent implements OnInit {
   private loadAppointmentHistory(): void {
     const user = this.authService.getCurrentUser();
     if (user?.uuid) {
-      this.appointmentService.getAppointmentHistory(user.uuid).subscribe({
-        next: (appointments) => {
-          this.history.set(appointments);
+      // Use paginated method for better performance, but just get the first page
+      this.appointmentService.getAppointmentHistoryPaginated(user.uuid, 0, 20).subscribe({
+        next: (response) => {
+          this.history.set(response.appointments);
         },
         error: () => {
           this.history.set([]);
@@ -76,19 +79,42 @@ export class ProfileComponent implements OnInit {
   password = this.fb.control('');
 
   saveProfile() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) { 
+      this.form.markAllAsTouched(); 
+      return; 
+    }
+    
+    const user = this.authService.getCurrentUser();
+    if (!user?.uuid) {
+      alert('User not logged in!');
+      return;
+    }
+    
     const formData = this.form.getRawValue();
-    const user = new UserModel(
-      'user-' + Date.now(),
-      formData.firstName!,
-      formData.lastName!,
-      formData.email!,
-      formData.phone!,
-      formData.dob!,
-      formData.address!,
-      'patient'
-    );
-    alert('Profile saved!\n' + JSON.stringify(user, null, 2));
+    const profileData = {
+      username: user.username,
+      firstName: formData.firstName!,
+      lastName: formData.lastName!,
+      email: formData.email!,
+      phone: formData.phone!,
+      dob: formData.dob!,
+      address: formData.address!
+    };
+    
+    this.userService.updateUserProfile(user.uuid, profileData).subscribe({
+      next: (updatedUser) => {
+        if (updatedUser) {
+          // Update the current user in auth service
+          this.authService.setCurrentUser(updatedUser);
+          alert('Profile saved successfully!');
+        } else {
+          alert('Failed to save profile. Please try again.');
+        }
+      },
+      error: () => {
+        alert('Failed to save profile. Please try again.');
+      }
+    });
   }
 
   view(item: AppointmentModel) { alert('View appointment: ' + item.doctor); }

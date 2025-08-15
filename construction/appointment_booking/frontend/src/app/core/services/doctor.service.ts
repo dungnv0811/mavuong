@@ -1,13 +1,17 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay, switchMap } from 'rxjs/operators';
+import { delay, switchMap, map, catchError } from 'rxjs/operators';
 import { DoctorBookingService } from './doctor-booking.service';
 import { DoctorProfile } from '../../shared/models/doctor.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DoctorService {
+  private http = inject(HttpClient);
+  private baseUrl = environment.apiUrl;
   private doctorBookingService = inject(DoctorBookingService);
 
   private mockDoctorProfiles: { [key: string]: any } = {
@@ -77,54 +81,90 @@ export class DoctorService {
   };
 
   getDoctorProfile(userUuid: string): Observable<DoctorProfile> {
-    return this.doctorBookingService.getDoctorBookingInfo(userUuid).pipe(
-      switchMap(doctorInfo => {
-        if (doctorInfo) {
-          const profileData = this.mockDoctorProfiles[userUuid] || {};
-          const mockProfile = new DoctorProfile(
-            userUuid,
-            profileData.firstName || doctorInfo.name.split(' ')[1] || 'John',
-            profileData.lastName || doctorInfo.name.split(' ')[2] || 'Doe',
-            profileData.professionalTitle || 'MD, Board Certified ' + doctorInfo.specialty,
-            doctorInfo.specialty,
-            profileData.yearsExperience || 12,
-            profileData.biography || `${doctorInfo.name} is a board-certified ${doctorInfo.specialty.toLowerCase()} with extensive experience...`,
-            profileData.email || doctorInfo.name.toLowerCase().replace(/\s+/g, '.') + '@example.com',
-            profileData.phone || '(893) 123-4567',
-            {
-              street: '123 Maple Street',
-              city: 'Anytown',
-              state: 'CA',
-              postalCode: '90210',
-              country: 'USA'
-            },
-            profileData.medicalLicenseNumber || 'MD123456',
-            profileData.certifications || 'M.D., Medical School, 2016\nBoard Certified ' + doctorInfo.specialty + ', 2018',
-            profileData.memberships || 'American Medical Association\nSpecialty Medical Association',
-            doctorInfo.avatar
-          );
-          return of(mockProfile);
-        } else {
-          const mockProfile = new DoctorProfile(
-            userUuid,
-            'Unknown',
-            'Doctor',
-            'MD',
-            'General Practice',
-            5,
-            'Doctor profile not found.',
-            'unknown@example.com',
-            '(000) 000-0000',
-            { street: 'Unknown', city: 'Unknown', state: 'Unknown', postalCode: '00000', country: 'Unknown' },
-            'Unknown',
-            'Unknown',
-            'Unknown',
-            '/assets/images/male_avatar_default.png'
-          );
-          return of(mockProfile);
-        }
+    console.log('👨‍⚕️ Getting doctor profile for:', userUuid);
+    
+    return this.http.get<any>(`${this.baseUrl}/doctors/${userUuid}/profile`).pipe(
+      map((response: any) => {
+        console.log('👨‍⚕️ Backend doctor profile response:', response);
+        const profileData = response.profile || response;
+        
+        return new DoctorProfile(
+          profileData.uuid || userUuid,
+          profileData.firstName,
+          profileData.lastName,
+          profileData.professionalTitle || `MD, Board Certified ${profileData.specialty}`,
+          profileData.specialty,
+          profileData.yearsExperience || 10,
+          profileData.biography || `Dr. ${profileData.firstName} ${profileData.lastName} is a board-certified ${profileData.specialty?.toLowerCase()} with extensive experience...`,
+          profileData.email,
+          profileData.phone,
+          profileData.address || {
+            street: '123 Medical Plaza',
+            city: 'Healthcare City',
+            state: 'CA',
+            postalCode: '90210',
+            country: 'USA'
+          },
+          profileData.medicalLicenseNumber || 'MD123456',
+          profileData.certifications || `M.D., Medical School\nBoard Certified ${profileData.specialty}`,
+          profileData.memberships || 'American Medical Association\nSpecialty Medical Association',
+          profileData.avatar || '/assets/images/male_avatar_default.png'
+        );
       }),
-      delay(1000)
+      catchError((error) => {
+        console.warn('👨‍⚕️ Backend call failed for doctor profile, using fallback:', error);
+        
+        // Fallback to building profile from doctor booking info + mock data
+        return this.doctorBookingService.getDoctorBookingInfo(userUuid).pipe(
+          switchMap(doctorInfo => {
+            if (doctorInfo) {
+              const profileData = this.mockDoctorProfiles[userUuid] || {};
+              const mockProfile = new DoctorProfile(
+                userUuid,
+                profileData.firstName || doctorInfo.name.split(' ')[1] || 'John',
+                profileData.lastName || doctorInfo.name.split(' ')[2] || 'Doe',
+                profileData.professionalTitle || 'MD, Board Certified ' + doctorInfo.specialty,
+                doctorInfo.specialty,
+                profileData.yearsExperience || 12,
+                profileData.biography || `${doctorInfo.name} is a board-certified ${doctorInfo.specialty.toLowerCase()} with extensive experience...`,
+                profileData.email || doctorInfo.name.toLowerCase().replace(/\s+/g, '.') + '@example.com',
+                profileData.phone || '(893) 123-4567',
+                {
+                  street: '123 Maple Street',
+                  city: 'Anytown',
+                  state: 'CA',
+                  postalCode: '90210',
+                  country: 'USA'
+                },
+                profileData.medicalLicenseNumber || 'MD123456',
+                profileData.certifications || 'M.D., Medical School, 2016\nBoard Certified ' + doctorInfo.specialty + ', 2018',
+                profileData.memberships || 'American Medical Association\nSpecialty Medical Association',
+                doctorInfo.avatar
+              );
+              return of(mockProfile);
+            } else {
+              const mockProfile = new DoctorProfile(
+                userUuid,
+                'Unknown',
+                'Doctor',
+                'MD',
+                'General Practice',
+                5,
+                'Doctor profile not found.',
+                'unknown@example.com',
+                '(000) 000-0000',
+                { street: 'Unknown', city: 'Unknown', state: 'Unknown', postalCode: '00000', country: 'Unknown' },
+                'Unknown',
+                'Unknown',
+                'Unknown',
+                '/assets/images/male_avatar_default.png'
+              );
+              return of(mockProfile);
+            }
+          }),
+          delay(1000)
+        );
+      })
     );
   }
 

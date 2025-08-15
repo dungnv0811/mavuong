@@ -1,23 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Doctor, Appointment, SymptomAnalysis } from '../../shared/models/appointment.model';
+import { UserModel, AppointmentModel } from '../../shared/models/booking-docter-models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = '/api';
+  private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
   // Doctor endpoints
-  getDoctors(filters?: any): Observable<Doctor[]> {
-    return this.http.get<Doctor[]>(`${this.baseUrl}/doctors`, { params: filters });
+  getDoctors(filters?: any): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/doctors`, { params: filters });
   }
 
-  getDoctorById(id: string): Observable<Doctor> {
-    return this.http.get<Doctor>(`${this.baseUrl}/doctors/${id}`);
+  getDoctorById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/doctors/${id}`);
   }
 
   getDoctorAvailability(id: string): Observable<any> {
@@ -25,20 +26,20 @@ export class ApiService {
   }
 
   // Appointment endpoints
-  bookAppointment(appointment: Partial<Appointment>): Observable<Appointment> {
-    return this.http.post<Appointment>(`${this.baseUrl}/appointments`, appointment);
+  bookAppointment(appointment: Partial<AppointmentModel>): Observable<AppointmentModel> {
+    return this.http.post<AppointmentModel>(`${this.baseUrl}/appointments`, appointment);
   }
 
-  getAppointments(): Observable<Appointment[]> {
-    return this.http.get<Appointment[]>(`${this.baseUrl}/appointments`);
+  getAppointments(): Observable<AppointmentModel[]> {
+    return this.http.get<AppointmentModel[]>(`${this.baseUrl}/appointments`);
   }
 
-  getAppointmentById(id: string): Observable<Appointment> {
-    return this.http.get<Appointment>(`${this.baseUrl}/appointments/${id}`);
+  getAppointmentById(id: string): Observable<AppointmentModel> {
+    return this.http.get<AppointmentModel>(`${this.baseUrl}/appointments/${id}`);
   }
 
-  rescheduleAppointment(id: string, appointment: Partial<Appointment>): Observable<Appointment> {
-    return this.http.put<Appointment>(`${this.baseUrl}/appointments/${id}`, appointment);
+  rescheduleAppointment(id: string, appointment: Partial<AppointmentModel>): Observable<AppointmentModel> {
+    return this.http.put<AppointmentModel>(`${this.baseUrl}/appointments/${id}`, appointment);
   }
 
   cancelAppointment(id: string): Observable<void> {
@@ -46,7 +47,7 @@ export class ApiService {
   }
 
   // Symptom analysis endpoints
-  analyzeSymptoms(description: string): Observable<SymptomAnalysis> {
-    return this.http.post<SymptomAnalysis>(`${this.baseUrl}/symptoms/analyze`, { description });
+  analyzeSymptoms(description: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/symptoms/analyze`, { description });
   }
 }

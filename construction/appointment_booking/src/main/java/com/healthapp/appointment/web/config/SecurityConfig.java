@@ -40,9 +40,10 @@ public class SecurityConfig {
         if (cognitoEnabled) {
             http.authorizeHttpRequests(authz -> authz
                     .requestMatchers("/h2-console/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                    .requestMatchers("/api/appointments/**").hasAnyRole("PATIENT", "DOCTOR")
-                    .requestMatchers("/api/doctors/**").permitAll()
-                    .requestMatchers("/api/symptoms/**").hasRole("PATIENT")
+                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/appointments/**").hasAnyRole("PATIENT", "DOCTOR")
+                    .requestMatchers("/doctors/**").permitAll()
+                    .requestMatchers("/symptoms/**").hasRole("PATIENT")
                     .anyRequest().authenticated()
                 );
 
@@ -56,10 +57,10 @@ public class SecurityConfig {
             // JWT Authentication mode
             http.authorizeHttpRequests(authz -> authz
                     .requestMatchers("/h2-console/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                    .requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/doctors/**").permitAll()
-                    .requestMatchers("/api/appointments/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN")
-                    .requestMatchers("/api/symptoms/**").hasAnyRole("PATIENT", "ADMIN")
+                    .requestMatchers("/auth/**").permitAll()
+                    .requestMatchers("/doctors/**").permitAll()
+                    .requestMatchers("/appointments/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN")
+                    .requestMatchers("/symptoms/**").hasAnyRole("PATIENT", "ADMIN")
                     .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -67,7 +68,7 @@ public class SecurityConfig {
             // Local/dev: open API for Angular without JWT
             http.authorizeHttpRequests(authz -> authz
                 .requestMatchers("/h2-console/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
-                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/**").permitAll()
                 .anyRequest().permitAll()
             );
         }

@@ -5,12 +5,13 @@ import com.healthapp.appointment.application.service.AppointmentApplicationServi
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping("/appointments")
 @CrossOrigin(origins = "http://localhost:4200")
 @Tag(name = "Appointments", description = "Appointment management operations")
 @SecurityRequirement(name = "bearer-key")
@@ -21,56 +22,130 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
     
+    @GetMapping("/upcoming")
+    @Operation(summary = "Get upcoming appointments", description = "Get user's upcoming appointments with pagination")
+    public ResponseEntity<PaginatedAppointmentsResponse> getUpcomingAppointments(
+            @RequestParam String userID,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            System.out.println("📅 AppointmentController: Getting upcoming appointments for user: " + userID);
+            List<AppointmentDto> allAppointments = appointmentService.getUpcomingAppointments(userID);
+            
+            // Apply pagination
+            int totalElements = allAppointments.size();
+            int totalPages = (int) Math.ceil((double) totalElements / size);
+            int startIndex = page * size;
+            int endIndex = Math.min(startIndex + size, totalElements);
+            
+            List<AppointmentDto> paginatedAppointments = startIndex < totalElements ? 
+                allAppointments.subList(startIndex, endIndex) : List.of();
+            
+            PaginatedAppointmentsResponse response = new PaginatedAppointmentsResponse(
+                paginatedAppointments,
+                page,
+                size,
+                totalElements,
+                totalPages,
+                page < totalPages - 1,
+                page > 0
+            );
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("📅 AppointmentController: Error getting upcoming appointments: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @GetMapping("/history")
+    @Operation(summary = "Get appointment history", description = "Get user's appointment history with pagination")
+    public ResponseEntity<PaginatedAppointmentsResponse> getAppointmentHistory(
+            @RequestParam String userID,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            System.out.println("📅 AppointmentController: Getting appointment history for user: " + userID);
+            List<AppointmentDto> allAppointments = appointmentService.getAppointmentHistory(userID);
+            
+            // Apply pagination
+            int totalElements = allAppointments.size();
+            int totalPages = (int) Math.ceil((double) totalElements / size);
+            int startIndex = page * size;
+            int endIndex = Math.min(startIndex + size, totalElements);
+            
+            List<AppointmentDto> paginatedAppointments = startIndex < totalElements ? 
+                allAppointments.subList(startIndex, endIndex) : List.of();
+            
+            PaginatedAppointmentsResponse response = new PaginatedAppointmentsResponse(
+                paginatedAppointments,
+                page,
+                size,
+                totalElements,
+                totalPages,
+                page < totalPages - 1,
+                page > 0
+            );
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("📅 AppointmentController: Error getting appointment history: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
     @PostMapping
-    @Operation(summary = "Book a new appointment", description = "Allows patients to book appointments with doctors")
-    public AppointmentDto bookAppointment(@RequestBody BookAppointmentRequest request) {
-        return appointmentService.bookAppointment(
-            request.patientId(),
-            request.doctorId(),
-            request.appointmentDateTime(),
-            request.notes()
-        );
-    }
-    
-    @GetMapping
-    @Operation(summary = "Get appointments", description = "Retrieve appointments by patient ID or doctor ID")
-    public List<AppointmentDto> getAppointments(@RequestParam(required = false) Long patientId,
-                                              @RequestParam(required = false) Long doctorId) {
-        if (patientId != null) {
-            return appointmentService.getPatientAppointments(patientId);
+    @Operation(summary = "Create new appointment", description = "Create new appointment with patient info")
+    public ResponseEntity<CreateAppointmentResponse> createAppointment(@RequestBody CreateAppointmentRequest request) {
+        try {
+            AppointmentDto appointment = appointmentService.createAppointment(request);
+            return ResponseEntity.ok(new CreateAppointmentResponse(appointment));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
-        if (doctorId != null) {
-            return appointmentService.getDoctorAppointments(doctorId);
+    }
+    
+    @PutMapping("/{appointmentId}/cancel")
+    @Operation(summary = "Cancel appointment", description = "Cancel appointment")
+    public ResponseEntity<CancelAppointmentResponse> cancelAppointment(@PathVariable String appointmentId) {
+        try {
+            AppointmentDto appointment = appointmentService.cancelAppointment(appointmentId);
+            return ResponseEntity.ok(new CancelAppointmentResponse(appointment));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
-        throw new IllegalArgumentException("Either patientId or doctorId must be provided");
     }
     
-    @PostMapping("/{id}/confirm")
-    public AppointmentDto confirmAppointment(@PathVariable Long id) {
-        return appointmentService.confirmAppointment(id);
-    }
-
-    @DeleteMapping("/{id}")
-    public AppointmentDto cancelAppointment(@PathVariable Long id) {
-        return appointmentService.cancelAppointment(id);
-    }
-
-    @PutMapping("/{id}")
-    public AppointmentDto rescheduleAppointment(@PathVariable Long id, @RequestBody RescheduleRequest request) {
-        return appointmentService.rescheduleAppointment(id, request.newDateTime());
-    }
-
-    @GetMapping("/{id}")
-    public AppointmentDto getById(@PathVariable Long id) {
-        return appointmentService.getAppointmentById(id);
+    // Request/Response records for frontend compatibility
+    public record CreateAppointmentRequest(
+        String doctorID,
+        String userID,
+        String dateTime,
+        String place,
+        PatientInfo patientInfo
+    ) {
+        public record PatientInfo(
+            String fullName,
+            String email,
+            String phone,
+            String gender,
+            String reason,
+            String insurance,
+            String policyNumber
+        ) {}
     }
     
-    public record BookAppointmentRequest(
-        Long patientId,
-        Long doctorId,
-        LocalDateTime appointmentDateTime,
-        String notes
+    public record UpcomingAppointmentsResponse(List<AppointmentDto> appointments) {}
+    public record AppointmentHistoryResponse(List<AppointmentDto> appointments) {}
+    public record PaginatedAppointmentsResponse(
+        List<AppointmentDto> appointments,
+        int page,
+        int size,
+        int totalElements,
+        int totalPages,
+        boolean hasNext,
+        boolean hasPrevious
     ) {}
-
-    public record RescheduleRequest(LocalDateTime newDateTime) {}
+    public record CreateAppointmentResponse(AppointmentDto appointment) {}
+    public record CancelAppointmentResponse(AppointmentDto appointment) {}
 }

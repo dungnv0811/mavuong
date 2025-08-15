@@ -191,16 +191,24 @@ export class LoginComponent implements OnInit {
 
   loginWithPassword(): void {
     if (!this.username || !this.password) return;
+    
+    if (this.isLoading) {
+      console.log('🔐 Login already in progress, ignoring duplicate request');
+      return;
+    }
 
     this.isLoading = true;
+    console.log('🔐 Login component attempting login for:', this.username);
     this.authService.login(this.username, this.password).subscribe({
       next: (user) => {
+        console.log('🔐 Login component successful, navigating to dashboard');
+        this.isLoading = false;
         this.router.navigate(['']);
-        this.isLoading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('🔐 Login component error:', error);
         this.isLoading = false;
-        alert('Login failed. Please check your credentials.');
+        alert(`Login failed: ${error.message || 'Please check your credentials.'}`);
       }
     });
   }
