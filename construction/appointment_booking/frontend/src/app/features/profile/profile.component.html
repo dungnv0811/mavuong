@@ -1,0 +1,92 @@
+<h1>My Profile</h1>
+
+<section class="card">
+  <h2>Personal Information</h2>
+  <div class="pi">
+    <img class="avatar" [src]="avatarUrl()" alt="avatar" />
+    <div class="grid" [formGroup]="form">
+      <div class="field"><label>First Name</label><input formControlName="firstName" /></div>
+      <div class="field"><label>Last Name</label><input formControlName="lastName" /></div>
+      <div class="field"><label>Email Address</label><input type="email" formControlName="email" /></div>
+      <div class="field"><label>Phone Number</label><input formControlName="phone" /></div>
+      <div class="field"><label>Date of Birth</label><input type="date" formControlName="dob" /></div>
+      <div class="field full"><label>Address</label><input formControlName="address" /></div>
+    </div>
+  </div>
+  <div class="actions"><button class="btn primary" (click)="saveProfile()">Save Changes</button></div>
+</section>
+
+<section class="card">
+  <h2>Appointment History</h2>
+  <p class="muted">View and manage your past and upcoming appointments.</p>
+  <div class="table">
+    <div class="th row">
+      <div>Doctor</div><div>Specialty</div><div>Date & Time</div><div>Status</div><div class="ta">Actions</div>
+    </div>
+    <div class="tr row" *ngFor="let it of history()">
+      <div class="doctor">{{ it.doctor }}</div>
+      <div>{{ it.specialty }}</div>
+      <div>{{ it.dateTime }}</div>
+      <div>
+        <span class="badge" [class.upcoming]="it.status===AppointmentStatus.UPCOMING"
+              [class.completed]="it.status===AppointmentStatus.COMPLETED"
+              [class.cancelled]="it.status===AppointmentStatus.CANCELLED">{{ it.status }}</span>
+      </div>
+      <div class="ta actions">
+        <button class="link" (click)="view(it)">View</button>
+        <button class="link" (click)="reschedule(it)" *ngIf="it.status!==AppointmentStatus.CANCELLED">Reschedule</button>
+        <button class="link danger" (click)="cancel(it)" *ngIf="it.status===AppointmentStatus.UPCOMING">Cancel</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Account Settings</h2>
+  <div class="settings">
+    <div class="row s-item">
+      <div>
+        <div class="title">Email Notifications</div>
+        <div class="muted">Receive updates about appointments and health tips.</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" [checked]="emailNotifications()" (change)="toggleEmail($event)" />
+        <span></span>
+      </label>
+    </div>
+
+    <div class="row s-item">
+      <div>
+        <div class="title">Enhanced Privacy Mode</div>
+        <div class="muted">Limit data sharing with third-party services.</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" [checked]="privacyMode()" (change)="toggleEmail($event)" />
+        <span></span>
+      </label>
+    </div>
+
+    <div class="row s-item">
+      <div>
+        <div class="title">Language</div>
+        <div class="muted">Select your preferred language for the application.</div>
+      </div>
+      <select class="select" [value]="language()" (change)="changeLanguage(($any($event.target).value))">
+        <option>English</option>
+        <option>Tiếng Việt</option>
+        <option>Español</option>
+      </select>
+    </div>
+
+    <div class="row s-item">
+      <div>
+        <div class="title">Change Password</div>
+        <div class="muted">Update your account password regularly.</div>
+      </div>
+      <div class="pwd">
+        <input type="password" placeholder="New password" [formControl]="password" />
+        <button class="btn" (click)="updatePassword()">Update Password</button>
+      </div>
+    </div>
+  </div>
+</section>

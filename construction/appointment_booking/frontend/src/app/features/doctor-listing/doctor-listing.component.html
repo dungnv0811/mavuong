@@ -1,0 +1,29 @@
+<h1>Find Your Doctor</h1>
+<div class="filters">
+  <input placeholder="Search by name or specialty…" [(ngModel)]="searchTerm" (input)="filterDoctors()" />
+  <div class="filter-buttons">
+    <button (click)="sortBy('specialty')">Specialty</button>
+    <button (click)="sortBy('rating')">Rating</button>
+    <button (click)="sortBy('nextAvailable')">Availability</button>
+    <button (click)="sortBy('name')">Location</button>
+  </div>
+</div>
+
+<div class="grid">
+  <article class="card" *ngFor="let doc of filteredDoctors()">
+    <img class="avatar" [src]="doc.avatar" alt="{{doc.name}}" />
+    <h2>{{ doc.name }}</h2>
+    <p class="specialty">{{ doc.specialty }}</p>
+    <p class="rating">⭐ {{ doc.rating }} ({{ doc.reviews }})</p>
+    <p class="next">Next Available: {{ doc.nextAvailable }}</p>
+    <button class="btn primary" (click)="bookAppointment(doc)">Book Appointment</button>
+  </article>
+</div>
+
+<div class="pagination">
+  <button>Previous</button>
+  <button class="active">1</button>
+  <button>2</button>
+  <button>3</button>
+  <button>Next</button>
+</div>

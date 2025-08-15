@@ -1,0 +1,79 @@
+<h1 *ngIf="isAuthenticated(); else welcomeGuest">Welcome back, {{ getCurrentUserName() }}!</h1>
+<ng-template #welcomeGuest>
+  <h1>Welcome to Fake Hospital Portal</h1>
+  <div class="welcome-intro">
+    <p class="lead">Your trusted partner in healthcare management. Connect with qualified doctors, book appointments, and take control of your health journey.</p>
+    <div class="features">
+      <div class="feature">
+        <span class="icon">🩺</span>
+        <h3>Expert Doctors</h3>
+        <p>Access to certified healthcare professionals across various specialties</p>
+      </div>
+      <div class="feature">
+        <span class="icon">📅</span>
+        <h3>Easy Booking</h3>
+        <p>Schedule appointments at your convenience with our simple booking system</p>
+      </div>
+      <div class="feature">
+        <span class="icon">💊</span>
+        <h3>Health Insights</h3>
+        <p>Get personalized health tips and track your wellness journey</p>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<section class="section" *ngIf="isAuthenticated()">
+  <h2>Upcoming Appointments</h2>
+  <div class="cards" *ngIf="hasUpcoming(); else empty">
+    <article class="card" *ngFor="let a of upcoming()">
+      <div class="card-hd">
+        <div class="avatar">
+          <img src="{{a.avatarLink}}" alt="Doctor Avatar" />
+        </div>
+        <div>
+          <div class="doctor">{{ a.doctor }}</div>
+          <div class="title">{{ a.specialty }}</div>
+        </div>
+      </div>
+      <ul class="meta">
+        <li>📅 {{ a.dateTime }}</li>
+        <li>📍 {{ a.place }}</li>
+      </ul>
+      <button class="btn sm" (click)="viewDetails(a)">View Details</button>
+    </article>
+  </div>
+  <ng-template #empty>
+    <p class="muted">No upcoming appointments.</p>
+  </ng-template>
+</section>
+
+<section class="section" *ngIf="isAuthenticated()">
+  <h2>Quick Actions</h2>
+  <div class="actions">
+    <button class="btn primary" routerLink="/appointment-booking">→ Book New Appointment</button>
+    <button class="btn" (click)="viewHistory()">View Appointment History</button>
+  </div>
+</section>
+
+<section class="section insights">
+  <h2>Health Insights</h2>
+  <div class="grid">
+    <article class="tip">
+      <h3>💧 Stay Hydrated!</h3>
+      <p>Drink at least 8 glasses of water daily to maintain energy levels and overall health.</p>
+    </article>
+    <article class="tip">
+      <h3>❤️ Daily Exercise Benefits</h3>
+      <p>Engage in ≥30 minutes of moderate exercise most days for heart health.</p>
+    </article>
+    <article class="tip">
+      <h3>🥦 Balanced Diet Tips</h3>
+      <p>Incorporate vegetables, fruits, and whole grains for sustained energy.</p>
+    </article>
+    <article class="tip">
+      <h3>🛌 Prioritize Sleep</h3>
+      <p>Aim for 7–9 hours of quality sleep each night for recovery.</p>
+    </article>
+  </div>
+</section>

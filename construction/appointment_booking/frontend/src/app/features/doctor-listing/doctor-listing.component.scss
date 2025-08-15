@@ -1,0 +1,16 @@
+$surface: #fff; $border:#e5e7eb; $muted:#6b7280; $text:#111827; $brand:#2563eb;
+
+h1 { margin-bottom: 16px; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+input { flex: 1; padding: 8px 12px; border:1px solid $border; border-radius: 8px; }
+.filter-buttons { display: flex; gap: 8px; button { padding: 8px 12px; border:1px solid $border; border-radius: 8px; background: #f9fafb; cursor: pointer; &:hover{ background: #f3f4f6; }}}
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 20px; }
+.card { background:$surface; border:1px solid $border; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,.04); width: 300px; height: 350px; display: flex; flex-direction: column; justify-content: space-between; }
+.avatar { width: 80px; height: 80px; border-radius: 999px; object-fit: cover; margin-bottom: 10px; }
+.specialty { color:$muted; font-size: 14px; margin: 4px 0; }
+.rating { font-size: 14px; margin: 4px 0; }
+.next { font-size: 13px; color:$muted; margin-bottom: 10px; }
+.btn { padding: 8px 12px; border-radius: 8px; border:1px solid $brand; background:$brand; color:#fff; cursor: pointer; &:hover{ filter: brightness(1.05); }}
+
+.pagination { display:flex; justify-content: center; gap: 6px; margin-top: 20px; button{ padding:6px 10px; border:1px solid $border; background:$surface; border-radius:6px; &.active{ background:$brand; color:#fff; border-color:$brand; }}}

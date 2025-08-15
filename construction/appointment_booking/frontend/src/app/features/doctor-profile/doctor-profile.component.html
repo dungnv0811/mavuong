@@ -1,0 +1,108 @@
+<!-- src/app/features/doctor-profile/doctor-profile.component.html -->
+<h1>{{ isReadonly ? 'Doctor Profile' : 'Edit Doctor Profile' }}</h1>
+
+<section class="card header">
+  <div class="who">
+    <div class="avatar">
+      <img [src]="previewUrl()" alt="Avatar" (error)="onImageError($event)">
+      <label *ngIf="!isReadonly" class="btn tiny">
+        Change Photo
+        <input type="file" accept="image/*" (change)="onPickAvatar($event)"/>
+      </label>
+    </div>
+    <div>
+      <div class="name">{{ fullName }}</div>
+      <div class="spec">{{ form.value.primarySpecialty }}</div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>About Me</h2>
+  <div class="grid" [formGroup]="form">
+    <div class="field">
+      <label>First Name</label>
+      <input formControlName="firstName" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>Last Name</label>
+      <input formControlName="lastName" [readonly]="isReadonly">
+    </div>
+    <div class="field full">
+      <label>Professional Title</label>
+      <input formControlName="professionalTitle" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>Primary Specialty</label>
+      <input formControlName="primarySpecialty" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>Years of Experience</label>
+      <input type="number" formControlName="yearsExperience" min="0" [readonly]="isReadonly">
+    </div>
+    <div class="field full">
+      <label>Biography</label>
+      <textarea rows="4" formControlName="biography" [readonly]="isReadonly"></textarea>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Contact Information</h2>
+  <div class="grid" [formGroup]="form">
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" formControlName="email" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>Phone Number</label>
+      <input formControlName="phone" [readonly]="isReadonly">
+    </div>
+  </div>
+
+  <div class="grid" formGroupName="address">
+    <div class="field full">
+      <label>Street Address</label>
+      <input formControlName="street" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>City</label>
+      <input formControlName="city" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>State/Province</label>
+      <input formControlName="state" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>Postal Code</label>
+      <input formControlName="postalCode" [readonly]="isReadonly">
+    </div>
+    <div class="field">
+      <label>Country</label>
+      <input formControlName="country" [readonly]="isReadonly">
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Qualifications & Licenses</h2>
+  <div class="grid" [formGroup]="form">
+    <div class="field">
+      <label>Medical License Number</label>
+      <input formControlName="medicalLicenseNumber" [readonly]="isReadonly">
+    </div>
+    <div class="field full">
+      <label>Certifications & Degrees</label>
+      <textarea rows="3" formControlName="certifications" [readonly]="isReadonly"></textarea>
+    </div>
+    <div class="field full">
+      <label>Professional Memberships & Affiliations</label>
+      <textarea rows="3" formControlName="memberships" [readonly]="isReadonly"></textarea>
+    </div>
+  </div>
+</section>
+
+<div *ngIf="!isReadonly" class="actions">
+  <button class="btn ghost" (click)="cancel()">Cancel</button>
+  <button class="btn primary" (click)="save()">Save Changes</button>
+</div>

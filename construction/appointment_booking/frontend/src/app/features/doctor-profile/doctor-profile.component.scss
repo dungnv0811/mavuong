@@ -1,0 +1,44 @@
+// src/app/features/doctor-profile/doctor-profile.component.scss
+$surface:#fff; $border:#e5e7eb; $muted:#6b7280; $text:#111827; $brand:#2563eb;
+
+:host{ display:block; color:$text; }
+h1{ font-size:26px; margin:8px 0 16px; }
+
+.card{
+  background:$surface; border:1px solid $border; border-radius:14px;
+  padding:16px; box-shadow:0 6px 16px rgba(0,0,0,.04); margin-bottom:16px;
+}
+
+.header .who{ display:flex; align-items:center; gap:14px; }
+.avatar{ display:flex; align-items:center; gap:10px; }
+.avatar img{ width:72px; height:72px; border-radius:999px; object-fit:cover; background:#eef2ff; border:1px solid $border; }
+.avatar input[type="file"]{ display:none; }
+.btn.tiny{ padding:6px 10px; }
+
+.name{ font-weight:700; font-size:18px; }
+.spec{ color:$muted; }
+
+.grid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; }
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field.full{ grid-column: span 2; }
+.field input, .field textarea{
+  padding:10px 12px; border:1px solid $border; border-radius:10px; background:$surface;
+}
+
+.field input[readonly], .field textarea[readonly]{
+  background-color: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+h2{ font-size:18px; margin:0 0 10px; }
+
+.actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+.btn{ padding:10px 14px; border:1px solid $border; border-radius:10px; background:#fff; cursor:pointer; }
+.btn.primary{ background:$brand; color:#fff; border-color:$brand; }
+.btn.ghost{ background:transparent; }
+
+@media (max-width: 900px){
+  .grid{ grid-template-columns:1fr; }
+  .field.full{ grid-column:auto; }
+}

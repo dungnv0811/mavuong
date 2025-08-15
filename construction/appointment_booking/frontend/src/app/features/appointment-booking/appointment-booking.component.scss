@@ -1,0 +1,26 @@
+$surface:#fff; $border:#e5e7eb; $muted:#6b7280; $text:#111827; $brand:#2563eb; $bg:#f8fafc;
+
+h1{ font-size:26px; margin:8px 0 18px; }
+.card{ background:$surface; border:1px solid $border; border-radius:14px; padding:16px; box-shadow:0 6px 16px rgba(0,0,0,.04); margin-bottom:16px; }
+.hd{ display:flex; align-items:center; gap:12px; }
+.avatar{ width:56px; height:56px; border-radius:999px; object-fit:cover; background:#eef2ff; border:1px solid $border; }
+.name{ font-weight:700; }
+.sp{ color:$muted; font-size:14px; }
+.rt{ color:$text; font-size:14px; }
+
+.datetime{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+.date label, .times label{ display:block; font-weight:600; margin-bottom:8px; }
+.slot-grid{ display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:8px; }
+.slot{ padding:10px 12px; border:1px solid $border; background:$surface; border-radius:10px; cursor:pointer; }
+.slot.active{ border-color:$brand; background:#eff6ff; }
+
+.grid{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px; }
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field.full{ grid-column: span 2; }
+.field input, .field select, .field textarea{ padding:10px 12px; border:1px solid $border; border-radius:10px; background:$surface; }
+.field.chk label{ color:$muted; font-size:14px; }
+
+.actions{ display:flex; justify-content:flex-end; margin-top:12px; }
+.btn{ padding:10px 12px; border:1px solid $border; border-radius:10px; background:$surface; cursor:pointer; &.primary{ background:$brand; color:#fff; border-color:$brand; } }
+
+@media (max-width: 900px){ .datetime{ grid-template-columns:1fr; } .grid{ grid-template-columns:1fr; } .field.full{ grid-column: auto; } }

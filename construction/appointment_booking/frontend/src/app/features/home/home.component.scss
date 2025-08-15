@@ -1,0 +1,41 @@
+$bg:#f3f4f6; $surface:#fff; $border:#e5e7eb; $text:#111827; $muted:#6b7280; $brand:#2563eb;
+
+:host { display:block; color:$text; }
+
+/* Hero */
+.hero { background: linear-gradient(180deg, #f8fafc, #eef2ff); border-bottom:1px solid $border; }
+.hero-inner { max-width: 1100px; margin: 0 auto; padding: 36px 20px; display:grid; gap:20px; grid-template-columns: 1.2fr 1fr; }
+.hero-text h1 { font-size: 36px; margin: 0 0 8px; }
+.lead { color:$muted; font-size: 16px; margin: 0 0 14px; }
+.cta { display:flex; gap:10px; margin: 10px 0 12px; }
+.btn { padding:10px 14px; border:1px solid $border; border-radius:10px; background:#fff; cursor: pointer; text-decoration:none; color:$text; font-weight:600; }
+.btn.primary { background:$brand; color:#fff; border-color:$brand; }
+.btn.ghost { background:transparent; }
+.trust { display:flex; align-items:center; gap:8px; color:$muted; margin-top:6px; }
+.trust img { width:28px; height:28px; border-radius:999px; }
+
+.hero-card { display:grid; gap:10px; align-content:start; }
+.mini-card { background:$surface; border:1px solid $border; border-radius:14px; padding:14px; box-shadow:0 6px 16px rgba(0,0,0,.04); }
+.mini-card .title { font-weight:700; margin-bottom:4px; }
+.mini-card .muted { color:$muted; }
+
+/* Features */
+.features { max-width: 1100px; margin: 0 auto; padding: 26px 20px; }
+.features h2 { font-size: 22px; margin-bottom: 14px; }
+.grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:14px; }
+.feature { background:$surface; border:1px solid $border; border-radius:14px; padding:16px; box-shadow:0 6px 16px rgba(0,0,0,.04); }
+.icon { font-size: 24px; margin-bottom: 8px; }
+.link { text-decoration:none; color:$brand; font-weight:600; }
+
+/* CTA strip */
+.cta-strip { background:#111827; color:#e5e7eb; margin-top: 12px; }
+.strip-inner { max-width:1100px; margin:0 auto; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.strip-inner .muted { color:#cbd5e1; }
+.actions { display:flex; gap:10px; }
+.actions .btn { background:#fff; border-color:transparent; }
+.actions .btn.primary { background:$brand; color:#fff; }
+
+@media (max-width: 960px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+}

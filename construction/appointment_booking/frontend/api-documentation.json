@@ -1,0 +1,332 @@
+{
+  "apiDocumentation": {
+    "title": "Healthcare Appointment Booking System API",
+    "version": "1.0.0",
+    "description": "API endpoints required for the healthcare appointment booking frontend application",
+    "baseUrl": "/api/v1",
+    "endpoints": {
+      "authentication": {
+        "login": {
+          "method": "POST",
+          "path": "/auth/login",
+          "description": "User login with email/username and password",
+          "requestBody": {
+            "emailOrUsername": "string",
+            "password": "string"
+          },
+          "response": {
+            "user": {
+              "uuid": "string",
+              "username": "string", 
+              "firstName": "string",
+              "lastName": "string",
+              "email": "string",
+              "phone": "string",
+              "dob": "string (YYYY-MM-DD)",
+              "address": "string",
+              "userRole": "string (patient|doctor)"
+            },
+            "token": "string"
+          }
+        },
+        "signup": {
+          "method": "POST",
+          "path": "/auth/signup",
+          "description": "User registration",
+          "requestBody": {
+            "username": "string",
+            "firstName": "string",
+            "lastName": "string",
+            "email": "string",
+            "phone": "string",
+            "dob": "string (YYYY-MM-DD)",
+            "address": "string",
+            "userRole": "string (patient|doctor)",
+            "password": "string"
+          },
+          "response": {
+            "user": "UserModel",
+            "token": "string"
+          }
+        },
+        "googleLogin": {
+          "method": "POST",
+          "path": "/auth/google",
+          "description": "Google OAuth login",
+          "requestBody": {
+            "googleToken": "string"
+          },
+          "response": {
+            "user": "UserModel",
+            "token": "string"
+          }
+        }
+      },
+      "users": {
+        "getUserById": {
+          "method": "GET",
+          "path": "/users/{userUuid}",
+          "description": "Get user by UUID",
+          "response": {
+            "user": "UserModel"
+          }
+        },
+        "getUserByEmailOrName": {
+          "method": "GET",
+          "path": "/users/search",
+          "description": "Search user by email, username, or full name",
+          "queryParams": {
+            "query": "string"
+          },
+          "response": {
+            "user": "UserModel"
+          }
+        },
+        "updateUser": {
+          "method": "PUT",
+          "path": "/users/{userUuid}",
+          "description": "Update user information",
+          "requestBody": "UserModel",
+          "response": {
+            "user": "UserModel"
+          }
+        }
+      },
+      "doctors": {
+        "getAllDoctors": {
+          "method": "GET",
+          "path": "/doctors",
+          "description": "Get all doctors for listing page",
+          "response": {
+            "doctors": [
+              {
+                "doctorID": "string",
+                "name": "string",
+                "specialty": "string",
+                "rating": "number",
+                "reviews": "number",
+                "nextAvailable": "string",
+                "avatar": "string"
+              }
+            ]
+          }
+        },
+        "getDoctorBookingInfo": {
+          "method": "GET",
+          "path": "/doctors/{doctorID}/booking-info",
+          "description": "Get doctor basic info for booking",
+          "response": {
+            "doctorID": "string",
+            "name": "string",
+            "specialty": "string",
+            "rating": "number",
+            "reviews": "number",
+            "nextAvailable": "string",
+            "avatar": "string"
+          }
+        },
+        "getDoctorProfile": {
+          "method": "GET",
+          "path": "/doctors/{doctorID}/profile",
+          "description": "Get detailed doctor profile",
+          "response": {
+            "uuid": "string",
+            "firstName": "string",
+            "lastName": "string",
+            "professionalTitle": "string",
+            "primarySpecialty": "string",
+            "yearsExperience": "number",
+            "biography": "string",
+            "email": "string",
+            "phone": "string",
+            "address": {
+              "street": "string",
+              "city": "string",
+              "state": "string",
+              "postalCode": "string",
+              "country": "string"
+            },
+            "medicalLicenseNumber": "string",
+            "certifications": "string",
+            "memberships": "string",
+            "avatar": "string"
+          }
+        },
+        "updateDoctorProfile": {
+          "method": "PUT",
+          "path": "/doctors/{doctorID}/profile",
+          "description": "Update doctor profile",
+          "requestBody": "DoctorProfileModel",
+          "response": {
+            "profile": "DoctorProfileModel"
+          }
+        }
+      },
+      "appointments": {
+        "getUpcomingAppointments": {
+          "method": "GET",
+          "path": "/appointments/upcoming",
+          "description": "Get user's upcoming appointments",
+          "queryParams": {
+            "userID": "string"
+          },
+          "response": {
+            "appointments": [
+              {
+                "uuid": "string",
+                "doctorID": "string",
+                "userID": "string",
+                "doctor": "string",
+                "specialty": "string",
+                "dateTime": "string",
+                "place": "string",
+                "status": "string (Upcoming|Completed|Cancelled|Booked)",
+                "avatarLink": "string"
+              }
+            ]
+          }
+        },
+        "getAppointmentHistory": {
+          "method": "GET",
+          "path": "/appointments/history",
+          "description": "Get user's appointment history",
+          "queryParams": {
+            "userID": "string"
+          },
+          "response": {
+            "appointments": ["AppointmentModel"]
+          }
+        },
+        "createAppointment": {
+          "method": "POST",
+          "path": "/appointments",
+          "description": "Create new appointment",
+          "requestBody": {
+            "doctorID": "string",
+            "userID": "string",
+            "dateTime": "string",
+            "place": "string",
+            "patientInfo": {
+              "fullName": "string",
+              "email": "string",
+              "phone": "string",
+              "gender": "string",
+              "reason": "string",
+              "insurance": "string",
+              "policyNumber": "string"
+            }
+          },
+          "response": {
+            "appointment": "AppointmentModel"
+          }
+        },
+        "cancelAppointment": {
+          "method": "PUT",
+          "path": "/appointments/{appointmentId}/cancel",
+          "description": "Cancel appointment",
+          "response": {
+            "appointment": "AppointmentModel"
+          }
+        }
+      },
+      "schedules": {
+        "getDoctorSchedule": {
+          "method": "GET",
+          "path": "/schedules/{doctorID}",
+          "description": "Get doctor's schedule for specific date",
+          "queryParams": {
+            "date": "string (YYYY-MM-DD)"
+          },
+          "response": {
+            "schedule": {
+              "doctorID": "string",
+              "date": "string",
+              "timeSlots": [
+                {
+                  "time": "string (HH:MM AM/PM)",
+                  "isBooked": "boolean",
+                  "isDisabled": "boolean"
+                }
+              ]
+            }
+          }
+        },
+        "bookTimeSlot": {
+          "method": "POST",
+          "path": "/schedules/{doctorID}/book",
+          "description": "Book a time slot",
+          "requestBody": {
+            "date": "string (YYYY-MM-DD)",
+            "time": "string (HH:MM AM/PM)"
+          },
+          "response": {
+            "success": "boolean"
+          }
+        },
+        "releaseTimeSlot": {
+          "method": "POST",
+          "path": "/schedules/{doctorID}/release",
+          "description": "Release a booked time slot",
+          "requestBody": {
+            "date": "string (YYYY-MM-DD)",
+            "time": "string (HH:MM AM/PM)"
+          },
+          "response": {
+            "success": "boolean"
+          }
+        }
+      }
+    },
+    "models": {
+      "UserModel": {
+        "uuid": "string",
+        "username": "string",
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string",
+        "phone": "string",
+        "dob": "string (YYYY-MM-DD)",
+        "address": "string",
+        "userRole": "string (patient|doctor)"
+      },
+      "AppointmentModel": {
+        "uuid": "string",
+        "doctorID": "string",
+        "userID": "string",
+        "doctor": "string",
+        "specialty": "string",
+        "dateTime": "string",
+        "place": "string",
+        "status": "string (Upcoming|Completed|Cancelled|Booked)",
+        "avatarLink": "string"
+      },
+      "DoctorBookingInfoModel": {
+        "doctorID": "string",
+        "name": "string",
+        "specialty": "string",
+        "rating": "number",
+        "reviews": "number",
+        "nextAvailable": "string",
+        "avatar": "string"
+      },
+      "TimeSlot": {
+        "time": "string (HH:MM AM/PM)",
+        "isBooked": "boolean",
+        "isDisabled": "boolean"
+      },
+      "DoctorSchedule": {
+        "doctorID": "string",
+        "date": "string (YYYY-MM-DD)",
+        "timeSlots": ["TimeSlot"]
+      }
+    },
+    "notes": {
+      "authentication": "All endpoints except auth require Bearer token in Authorization header",
+      "errorHandling": "All endpoints should return appropriate HTTP status codes and error messages",
+      "dateFormat": "Use YYYY-MM-DD format for dates",
+      "timeFormat": "Use HH:MM AM/PM format for times",
+      "userRoles": "Supported roles: 'patient', 'doctor'",
+      "appointmentStatuses": "Supported statuses: 'Upcoming', 'Completed', 'Cancelled', 'Booked'"
+    }
+  }
+}

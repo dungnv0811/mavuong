@@ -1,0 +1,41 @@
+<div class="app" xmlns="http://www.w3.org/1999/html">
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="{{ DEFAULT_LOGO }}" alt="logo" height="40" />
+      <span>FAKE HOSPITAL</span>
+    </div>
+    <nav class="topnav">
+      <a class="item" routerLink="/" routerLinkActive="active" *ngIf="authService.isAuthenticated()"><span class="dot"></span> Dashboard</a>
+      <a class="item" routerLink="/doctors" routerLinkActive="active" *ngIf="authService.isAuthenticated() && !isDoctorUser()"><span class="dot"></span> Doctor Listing</a>
+      <a class="item" (click)="navigateToProfile()" style="cursor: pointer" *ngIf="authService.isAuthenticated()"><span class="dot"></span> My Profile</a>
+    </nav>
+    <div class="top-actions">
+      <input class="search" placeholder="Search doctors or specialties…"/>
+      <button *ngIf="!authService.isAuthenticated()" class="btn ghost" routerLink="/login">Login</button>
+      <button *ngIf="!authService.isAuthenticated()" class="btn primary">Sign Up</button>
+      <button *ngIf="authService.isAuthenticated()" class="btn ghost" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a class="item" routerLink="/" routerLinkActive="active" *ngIf="authService.isAuthenticated()"><span><i class="fa fa-th"></i>Dashboard</span></a>
+      <a class="item" routerLink="/doctors" routerLinkActive="active" *ngIf="authService.isAuthenticated() && !isDoctorUser()"><span><i class="fa fa-stethoscope"></i>Doctor Listing</span></a>
+      <a class="item" (click)="navigateToProfile()" style="cursor: pointer" *ngIf="authService.isAuthenticated()"><span><i class="fa fa-user"></i>Profile</span></a>
+    </aside>
+
+    <!-- Main content -->
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="left">
+      <a>Product</a><a>Company</a><a>Legal</a>
+    </div>
+    <div class="right">© 2025 AI-DLC Hackathon</div>
+  </footer>
+</div>
