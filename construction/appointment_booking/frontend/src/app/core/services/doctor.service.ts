@@ -5,6 +5,7 @@ import { delay, switchMap, map, catchError } from 'rxjs/operators';
 import { DoctorBookingService } from './doctor-booking.service';
 import { DoctorProfile } from '../../shared/models/doctor.model';
 import { environment } from '../../../environments/environment';
+import {DEFAULT_AVATAR_MALE} from "../../features/constants/common.constants";
 
 @Injectable({
   providedIn: 'root'
@@ -82,12 +83,12 @@ export class DoctorService {
 
   getDoctorProfile(userUuid: string): Observable<DoctorProfile> {
     console.log('👨‍⚕️ Getting doctor profile for:', userUuid);
-    
+
     return this.http.get<any>(`${this.baseUrl}/doctors/${userUuid}/profile`).pipe(
       map((response: any) => {
         console.log('👨‍⚕️ Backend doctor profile response:', response);
         const profileData = response.profile || response;
-        
+
         return new DoctorProfile(
           profileData.uuid || userUuid,
           profileData.firstName,
@@ -108,12 +109,12 @@ export class DoctorService {
           profileData.medicalLicenseNumber || 'MD123456',
           profileData.certifications || `M.D., Medical School\nBoard Certified ${profileData.specialty}`,
           profileData.memberships || 'American Medical Association\nSpecialty Medical Association',
-          profileData.avatar || '/assets/images/male_avatar_default.png'
+          profileData.avatar || DEFAULT_AVATAR_MALE
         );
       }),
       catchError((error) => {
         console.warn('👨‍⚕️ Backend call failed for doctor profile, using fallback:', error);
-        
+
         // Fallback to building profile from doctor booking info + mock data
         return this.doctorBookingService.getDoctorBookingInfo(userUuid).pipe(
           switchMap(doctorInfo => {
@@ -157,7 +158,7 @@ export class DoctorService {
                 'Unknown',
                 'Unknown',
                 'Unknown',
-                '/assets/images/male_avatar_default.png'
+                DEFAULT_AVATAR_MALE
               );
               return of(mockProfile);
             }

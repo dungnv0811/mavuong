@@ -29,7 +29,7 @@
     <article class="card" *ngFor="let a of upcoming()">
       <div class="card-hd">
         <div class="avatar">
-          <img src="{{a.avatarLink}}" alt="Doctor Avatar" />
+          <img [src]="Math.random() > 0.5 ? DEFAULT_AVATAR_MALE : DEFAULT_AVATAR_FEMALE" alt="Doctor Avatar" />
         </div>
         <div>
           <div class="doctor">{{ a.doctor }}</div>

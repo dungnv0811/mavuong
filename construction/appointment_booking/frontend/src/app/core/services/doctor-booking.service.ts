@@ -12,7 +12,7 @@ import { environment } from '../../../environments/environment';
 export class DoctorBookingService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
-  
+
   // Fallback mock data for offline mode
   private mockDoctors: DoctorBookingInfoModels[] = [
     new DoctorBookingInfoModels('doc-001', 'Dr. Elena Rodriguez', 'General Practitioner', 4.8, 123, 'Today, 3:00 PM', DEFAULT_AVATAR_FEMALE),
@@ -28,7 +28,7 @@ export class DoctorBookingService {
 
   getDoctorBookingInfo(doctorID: string): Observable<DoctorBookingInfoModels | null> {
     console.log('🏥 Getting doctor booking info for:', doctorID);
-    
+
     return this.http.get<any>(`${this.baseUrl}/doctors/${doctorID}/booking-info`).pipe(
       map((response: any) => {
         console.log('🏥 Backend doctor booking response:', response);
@@ -60,12 +60,12 @@ export class DoctorBookingService {
       sortBy: sortBy,
       sortDir: sortDir
     });
-    
+
     return this.http.get<any>(`${this.baseUrl}/doctors?${params.toString()}`).pipe(
       map((response: any) => {
         console.log('🏥 Backend paginated doctors response:', response);
         const doctors = response.doctors || response;
-        
+
         const mappedDoctors = doctors.map((doctor: any) => new DoctorBookingInfoModels(
           doctor.doctorID || doctor.id || `doc-${doctor.id}`,
           doctor.name,
@@ -73,9 +73,9 @@ export class DoctorBookingService {
           doctor.averageRating || doctor.rating || 4.5,
           doctor.totalReviews || doctor.reviews || 50,
           doctor.nextAvailable || 'Available Today',
-          doctor.avatar || (doctor.name?.includes('Elena') || doctor.name?.includes('Emily') || doctor.name?.includes('Sarah') || doctor.name?.includes('Olivia') || doctor.name?.includes('Sofia') ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE)
+          doctor.avatar || (Math.random() > 0.5 ? DEFAULT_AVATAR_MALE : DEFAULT_AVATAR_FEMALE)
         ));
-        
+
         return {
           doctors: mappedDoctors,
           page: response.page || 0,
@@ -90,12 +90,12 @@ export class DoctorBookingService {
         console.warn('🏥 Backend call failed for doctors list, using mock data:', error);
         // Apply client-side pagination to mock data
         const filteredDoctors = this.mockDoctors.filter(doctor =>
-          search === '' || 
+          search === '' ||
           doctor.name.toLowerCase().includes(search.toLowerCase()) ||
           doctor.specialty.toLowerCase().includes(search.toLowerCase())
         );
         const paginatedDoctors = filteredDoctors.slice(page * size, (page + 1) * size);
-        
+
         return of({
           doctors: paginatedDoctors,
           page: page,

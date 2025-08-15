@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { DoctorService } from '../../core/services/doctor.service';
 import { DoctorProfile } from '../../shared/models/doctor.model';
+import {DEFAULT_AVATAR_MALE} from "../constants/common.constants";
 
 @Component({
   selector: 'app-doctor-profile',
@@ -26,7 +27,7 @@ export class DoctorProfileComponent implements OnInit {
   isReadonly = !this.canEdit();
 
   // Ảnh preview (mặc định dùng assets)
-  previewUrl = signal<string>('/assets/images/male_avatar_default.png');
+  previewUrl = signal<string>(DEFAULT_AVATAR_MALE);
   private file: File | null = null;
 
   form = this.fb.group({
@@ -151,6 +152,6 @@ export class DoctorProfileComponent implements OnInit {
   }
 
   onImageError(event: Event) {
-    (event.target as HTMLImageElement).src = '/assets/images/male_avatar_default.png';
+    (event.target as HTMLImageElement).src = DEFAULT_AVATAR_MALE;
   }
 }

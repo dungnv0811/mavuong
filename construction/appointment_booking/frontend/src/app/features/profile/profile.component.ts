@@ -123,6 +123,7 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['health-connect/appointment-booking'], {
       queryParams: {
         appointmentId: item.uuid,
+        doctorID: item.doctorID,
         viewMode: 'true'
       }
     });

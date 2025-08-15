@@ -76,7 +76,7 @@ declare const google: any;
           </button>
         </div>
 
-        <div class="divider">OR</div>
+        <div class="divider"></div>
 
         <!-- Google Login -->
         <div class="text-center">

@@ -40,7 +40,7 @@
 
 <div class="grid" *ngIf="!isLoading()">
   <article class="card" *ngFor="let doc of doctors()">
-    <img class="avatar" [src]="doc.avatar" alt="{{doc.name}}" />
+    <img class="avatar" [src]="Math.random() > 0.5 ? DEFAULT_AVATAR_MALE : DEFAULT_AVATAR_FEMALE" alt="{{doc.name}}" />
     <h2>{{ doc.name }}</h2>
     <p class="specialty">{{ doc.specialty }}</p>
     <p class="rating">⭐ {{ doc.rating }} ({{ doc.reviews }} reviews)</p>

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DoctorBookingInfoModels } from '../../shared/models/booking-docter-models';
 import { DoctorBookingService } from '../../core/services/doctor-booking.service';
+import {DEFAULT_AVATAR_FEMALE, DEFAULT_AVATAR_MALE} from "../constants/common.constants";
 
 @Component({
   selector: 'app-doctor-listing',
@@ -122,11 +123,11 @@ export class DoctorListingComponent implements OnInit {
     const pages: number[] = [];
     const total = this.totalPages();
     const current = this.currentPage();
-    
+
     // Show at most 5 page numbers
     let start = Math.max(0, current - 2);
     let end = Math.min(total - 1, current + 2);
-    
+
     // Adjust if we don't have enough pages on one side
     if (end - start < 4) {
       if (start === 0) {
@@ -135,11 +136,15 @@ export class DoctorListingComponent implements OnInit {
         start = Math.max(0, end - 4);
       }
     }
-    
+
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   }
+
+  protected readonly DEFAULT_AVATAR_MALE = DEFAULT_AVATAR_MALE;
+  protected readonly Math = Math;
+  protected readonly DEFAULT_AVATAR_FEMALE = DEFAULT_AVATAR_FEMALE;
 }

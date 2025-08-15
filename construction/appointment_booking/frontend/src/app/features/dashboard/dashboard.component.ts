@@ -4,6 +4,7 @@ import { AppointmentModel } from '../../shared/models/booking-docter-models';
 import {RouterLink, Router} from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { AppointmentService } from '../../core/services/appointment.service';
+import {DEFAULT_AVATAR_FEMALE, DEFAULT_AVATAR_MALE} from "../constants/common.constants";
 
 
 
@@ -52,12 +53,19 @@ export class DashboardComponent implements OnInit {
   }
 
   viewDetails(appointment: AppointmentModel): void {
-    this.router.navigate(['health-connect/doctor/profile'], {
-      queryParams: { doctorID: appointment.doctorID }
+    this.router.navigate(['health-connect/appointment-booking'], {
+      queryParams: {
+        appointmentId: appointment.uuid,
+        doctorID: appointment.doctorID,
+        viewMode: 'true'
+      }
     });
   }
 
   bookNew() { alert('Book new appointment – demo'); }
   viewHistory() { alert('Open appointment history – demo'); }
 
+  protected readonly Math = Math;
+  protected readonly DEFAULT_AVATAR_MALE = DEFAULT_AVATAR_MALE;
+  protected readonly DEFAULT_AVATAR_FEMALE = DEFAULT_AVATAR_FEMALE;
 }

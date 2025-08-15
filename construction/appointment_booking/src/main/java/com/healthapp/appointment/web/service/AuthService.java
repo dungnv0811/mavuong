@@ -45,21 +45,38 @@ public class AuthService {
         users.put("patient1", patient);
         users.put("patient1@test.com", patient);
         
-        // Demo doctor
+        // All doctors from the list
+        createDoctorAccount("elena.rodriguez", "Dr. Elena", "Rodriguez", "elena.rodriguez@hospital.com", "(555) 001-0001");
+        createDoctorAccount("michael.chen", "Dr. Michael", "Chen", "michael.chen@hospital.com", "(555) 002-0002");
+        createDoctorAccount("sarah.kim", "Dr. Sarah", "Kim", "sarah.kim@hospital.com", "(555) 003-0003");
+        createDoctorAccount("david.green", "Dr. David", "Green", "david.green@hospital.com", "(555) 004-0004");
+        createDoctorAccount("emily.white", "Dr. Emily", "White", "emily.white@hospital.com", "(555) 005-0005");
+        createDoctorAccount("james.brown", "Dr. James", "Brown", "james.brown@hospital.com", "(555) 006-0006");
+        createDoctorAccount("olivia.perez", "Dr. Olivia", "Perez", "olivia.perez@hospital.com", "(555) 007-0007");
+        createDoctorAccount("ben.carter", "Dr. Ben", "Carter", "ben.carter@hospital.com", "(555) 008-0008");
+        createDoctorAccount("sofia.garcia", "Dr. Sofia", "Garcia", "sofia.garcia@hospital.com", "(555) 009-0009");
+        createDoctorAccount("john.smith", "Dr. John", "Smith", "john.smith@hospital.com", "555-0101");
+        createDoctorAccount("sarah.johnson", "Dr. Sarah", "Johnson", "sarah.johnson@hospital.com", "555-0102");
+        createDoctorAccount("mike.wilson", "Dr. Mike", "Wilson", "mike.wilson@hospital.com", "555-0103");
+        createDoctorAccount("lisa.brown", "Dr. Lisa", "Brown", "lisa.brown@hospital.com", "555-0104");
+        createDoctorAccount("david.lee", "Dr. David", "Lee", "david.lee@hospital.com", "555-0105");
+    }
+    
+    private void createDoctorAccount(String username, String firstName, String lastName, String email, String phone) {
         UserRecord doctor = new UserRecord(
             UUID.randomUUID().toString(),
-            "doctor1",
-            "Dr. Jane",
-            "Smith",
-            "doctor1@test.com", 
-            "+1234567891",
-            LocalDate.of(1980, 5, 15),
-            "456 Medical Ave",
+            username,
+            firstName,
+            lastName,
+            email,
+            phone,
+            LocalDate.of(1975, 1, 1), // Default DOB
+            "Medical Center", // Default address
             "DOCTOR",
             passwordEncoder.encode("password")
         );
-        users.put("doctor1", doctor);
-        users.put("doctor1@test.com", doctor);
+        users.put(username, doctor);
+        users.put(email, doctor);
     }
     
     public String authenticate(String username, String password) {
