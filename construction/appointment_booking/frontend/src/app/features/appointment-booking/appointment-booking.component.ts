@@ -47,7 +47,7 @@ export class AppointmentBookingComponent implements OnInit {
   private checkViewMode(): void {
     const appointmentId = this.route.snapshot.queryParams['appointmentId'];
     const viewMode = this.route.snapshot.queryParams['viewMode'];
-    
+
     if (appointmentId && viewMode === 'true') {
       this.isViewMode.set(true);
       this.loadAppointmentForView(appointmentId);
@@ -150,7 +150,7 @@ export class AppointmentBookingComponent implements OnInit {
 
   viewDoctorProfile(): void {
     if (this.doctor().doctorID) {
-      this.router.navigate(['/doctor/profile'], {
+      this.router.navigate(['health-connect/doctor/profile'], {
         queryParams: { doctorID: this.doctor().doctorID }
       });
     }
@@ -188,7 +188,7 @@ export class AppointmentBookingComponent implements OnInit {
           this.appointmentService.createAppointment(newAppointment).subscribe({
             next: (appointment) => {
               alert('Appointment booked successfully!');
-              this.router.navigate(['/']);
+              this.router.navigate(['/health-connect/profile']);
               this.isLoading.set(false);
             },
             error: () => {

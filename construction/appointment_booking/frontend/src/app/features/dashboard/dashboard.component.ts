@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
   }
 
   viewDetails(appointment: AppointmentModel): void {
-    this.router.navigate(['/doctor/profile'], {
+    this.router.navigate(['health-connect/doctor/profile'], {
       queryParams: { doctorID: appointment.doctorID }
     });
   }

@@ -93,7 +93,7 @@ export class DoctorListingComponent implements OnInit {
   }
 
   bookAppointment(doctor: DoctorBookingInfoModels): void {
-    this.router.navigate(['/appointment-booking'], {
+    this.router.navigate(['/health-connect/appointment-booking'], {
       queryParams: { doctorID: doctor.doctorID }
     });
   }

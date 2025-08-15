@@ -7,21 +7,21 @@
 
 <div class="filters" *ngIf="!isLoading()">
   <div class="search-row">
-    <input placeholder="Search by name or specialty…" [(ngModel)]="searchTerm" (input)="filterDoctors()" />
-    <select [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange()">
+    <input class="inp" placeholder="Search by name or specialty…" [(ngModel)]="searchTerm" (input)="filterDoctors()" />
+    <select class="sel" [(ngModel)]="selectedSpecialty" (change)="onSpecialtyChange()">
       <option value="">All Specialties</option>
       <option *ngFor="let specialty of specialties" [value]="specialty">{{ specialty }}</option>
     </select>
   </div>
-  
+
   <div class="filter-buttons">
-    <label>Sort by:</label>
-    <select [(ngModel)]="sortBy" (change)="onSortChange()">
+    <span class="label-muted">Sort by:</span>
+    <select class="sel" [(ngModel)]="sortBy" (change)="onSortChange()">
       <option value="name">Name</option>
       <option value="specialty">Specialty</option>
       <option value="rating">Rating</option>
     </select>
-    <select [(ngModel)]="sortDir" (change)="onSortChange()">
+    <select class="sel" [(ngModel)]="sortDir" (change)="onSortChange()">
       <option value="asc">Ascending</option>
       <option value="desc">Descending</option>
     </select>
@@ -32,7 +32,7 @@
 <div class="results-info" *ngIf="!isLoading()">
   <p>
     Showing {{ doctors().length }} of {{ totalElements() }} doctors
-    <span *ngIf="searchTerm || selectedSpecialty"> 
+    <span *ngIf="searchTerm || selectedSpecialty">
       (filtered by {{ searchTerm ? '"' + searchTerm + '"' : '' }}{{ searchTerm && selectedSpecialty ? ' and ' : '' }}{{ selectedSpecialty ? selectedSpecialty : '' }})
     </span>
   </p>
@@ -56,25 +56,25 @@
 
 <!-- Pagination -->
 <div class="pagination" *ngIf="!isLoading() && totalPages() > 1">
-  <button 
-    [disabled]="!hasPrevious()" 
+  <button
+    [disabled]="!hasPrevious()"
     (click)="previousPage()"
     class="btn"
   >
     Previous
   </button>
-  
-  <button 
-    *ngFor="let page of getPageNumbers()" 
+
+  <button
+    *ngFor="let page of getPageNumbers()"
     [class.active]="page === currentPage()"
     (click)="goToPage(page)"
     class="btn page-btn"
   >
     {{ page + 1 }}
   </button>
-  
-  <button 
-    [disabled]="!hasNext()" 
+
+  <button
+    [disabled]="!hasNext()"
     (click)="nextPage()"
     class="btn"
   >

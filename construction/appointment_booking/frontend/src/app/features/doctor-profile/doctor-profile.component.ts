@@ -142,7 +142,7 @@ export class DoctorProfileComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/profile']); // hoặc history.back()
+    this.router.navigate(['health-connect/profile']); // hoặc history.back()
   }
 
   canEdit(): boolean {

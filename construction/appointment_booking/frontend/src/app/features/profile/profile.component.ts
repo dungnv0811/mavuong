@@ -81,17 +81,17 @@ export class ProfileComponent implements OnInit {
   password = this.fb.control('');
 
   saveProfile() {
-    if (this.form.invalid) { 
-      this.form.markAllAsTouched(); 
-      return; 
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
     }
-    
+
     const user = this.authService.getCurrentUser();
     if (!user?.uuid) {
       alert('User not logged in!');
       return;
     }
-    
+
     const formData = this.form.getRawValue();
     const profileData = {
       username: user.username,
@@ -102,7 +102,7 @@ export class ProfileComponent implements OnInit {
       dob: formData.dob!,
       address: formData.address!
     };
-    
+
     this.userService.updateUserProfile(user.uuid, profileData).subscribe({
       next: (updatedUser) => {
         if (updatedUser) {
@@ -120,7 +120,7 @@ export class ProfileComponent implements OnInit {
   }
 
   view(item: AppointmentModel) {
-    this.router.navigate(['/appointment-booking'], {
+    this.router.navigate(['health-connect/appointment-booking'], {
       queryParams: {
         appointmentId: item.uuid,
         viewMode: 'true'
