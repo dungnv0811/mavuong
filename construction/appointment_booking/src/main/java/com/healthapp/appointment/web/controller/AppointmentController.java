@@ -24,7 +24,7 @@ public class AppointmentController {
     
     @GetMapping("/upcoming")
     @Operation(summary = "Get upcoming appointments", description = "Get user's upcoming appointments with pagination")
-    public ResponseEntity<PaginatedAppointmentsResponse> getUpcomingAppointments(
+    public ResponseEntity<EnrichedPaginatedAppointmentsResponse> getUpcomingAppointments(
             @RequestParam String userID,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -32,16 +32,21 @@ public class AppointmentController {
             System.out.println("📅 AppointmentController: Getting upcoming appointments for user: " + userID);
             List<AppointmentDto> allAppointments = appointmentService.getUpcomingAppointments(userID);
             
+            // Enrich appointments with doctor information for frontend
+            List<EnrichedAppointmentDto> enrichedAppointments = allAppointments.stream()
+                .map(this::enrichAppointmentData)
+                .toList();
+            
             // Apply pagination
-            int totalElements = allAppointments.size();
+            int totalElements = enrichedAppointments.size();
             int totalPages = (int) Math.ceil((double) totalElements / size);
             int startIndex = page * size;
             int endIndex = Math.min(startIndex + size, totalElements);
             
-            List<AppointmentDto> paginatedAppointments = startIndex < totalElements ? 
-                allAppointments.subList(startIndex, endIndex) : List.of();
+            List<EnrichedAppointmentDto> paginatedAppointments = startIndex < totalElements ? 
+                enrichedAppointments.subList(startIndex, endIndex) : List.of();
             
-            PaginatedAppointmentsResponse response = new PaginatedAppointmentsResponse(
+            EnrichedPaginatedAppointmentsResponse response = new EnrichedPaginatedAppointmentsResponse(
                 paginatedAppointments,
                 page,
                 size,
@@ -60,7 +65,7 @@ public class AppointmentController {
     
     @GetMapping("/history")
     @Operation(summary = "Get appointment history", description = "Get user's appointment history with pagination")
-    public ResponseEntity<PaginatedAppointmentsResponse> getAppointmentHistory(
+    public ResponseEntity<EnrichedPaginatedAppointmentsResponse> getAppointmentHistory(
             @RequestParam String userID,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -68,16 +73,21 @@ public class AppointmentController {
             System.out.println("📅 AppointmentController: Getting appointment history for user: " + userID);
             List<AppointmentDto> allAppointments = appointmentService.getAppointmentHistory(userID);
             
+            // Enrich appointments with doctor information for frontend
+            List<EnrichedAppointmentDto> enrichedAppointments = allAppointments.stream()
+                .map(this::enrichAppointmentData)
+                .toList();
+            
             // Apply pagination
-            int totalElements = allAppointments.size();
+            int totalElements = enrichedAppointments.size();
             int totalPages = (int) Math.ceil((double) totalElements / size);
             int startIndex = page * size;
             int endIndex = Math.min(startIndex + size, totalElements);
             
-            List<AppointmentDto> paginatedAppointments = startIndex < totalElements ? 
-                allAppointments.subList(startIndex, endIndex) : List.of();
+            List<EnrichedAppointmentDto> paginatedAppointments = startIndex < totalElements ? 
+                enrichedAppointments.subList(startIndex, endIndex) : List.of();
             
-            PaginatedAppointmentsResponse response = new PaginatedAppointmentsResponse(
+            EnrichedPaginatedAppointmentsResponse response = new EnrichedPaginatedAppointmentsResponse(
                 paginatedAppointments,
                 page,
                 size,
@@ -148,4 +158,71 @@ public class AppointmentController {
     ) {}
     public record CreateAppointmentResponse(AppointmentDto appointment) {}
     public record CancelAppointmentResponse(AppointmentDto appointment) {}
+    
+    // Enhanced DTOs for frontend
+    public record EnrichedAppointmentDto(
+        String uuid,
+        String doctorID,
+        String userID,
+        String doctor,
+        String specialty,
+        String dateTime,
+        String place,
+        String status,
+        String avatarLink
+    ) {}
+    
+    public record EnrichedPaginatedAppointmentsResponse(
+        List<EnrichedAppointmentDto> appointments,
+        int page,
+        int size,
+        int totalElements,
+        int totalPages,
+        boolean hasNext,
+        boolean hasPrevious
+    ) {}
+    
+    // Helper method to enrich appointment data
+    private EnrichedAppointmentDto enrichAppointmentData(AppointmentDto appointment) {
+        // Map doctor IDs to names and specialties (simplified mapping)
+        String doctorName = switch (appointment.doctorId().intValue()) {
+            case 1 -> "Dr. Elena Rodriguez";
+            case 2 -> "Dr. Michael Chen";
+            case 3 -> "Dr. Sarah Kim";
+            case 4 -> "Dr. David Green";
+            case 5 -> "Dr. Emily White";
+            case 6 -> "Dr. James Brown";
+            case 7 -> "Dr. Olivia Perez";
+            case 8 -> "Dr. Ben Carter";
+            default -> "Doctor " + appointment.doctorId();
+        };
+        
+        String specialty = switch (appointment.doctorId().intValue()) {
+            case 1 -> "General Practice";
+            case 2 -> "Cardiology";
+            case 3 -> "Dermatology";
+            case 4 -> "Cardiology";
+            case 5 -> "Ophthalmology";
+            case 6 -> "Orthopedics";
+            case 7 -> "Neurology";
+            case 8 -> "Psychiatry";
+            default -> "General Practice";
+        };
+        
+        String avatarLink = doctorName.contains("Elena") || doctorName.contains("Emily") || 
+                           doctorName.contains("Sarah") || doctorName.contains("Olivia") ? 
+                           "/assets/avatars/female-doctor.jpg" : "/assets/avatars/male-doctor.jpg";
+        
+        return new EnrichedAppointmentDto(
+            "apt-" + appointment.id(),
+            String.valueOf(appointment.doctorId()),
+            String.valueOf(appointment.patientId()),
+            doctorName,
+            specialty,
+            appointment.appointmentDateTime().toString(),
+            "Hospital",
+            appointment.status().toString(),
+            avatarLink
+        );
+    }
 }
