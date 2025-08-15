@@ -27,3 +27,5 @@ security:
   cognito:
     issuer-uri: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_example
     enabled: false
+  jwt:
+    enabled: true

@@ -2,6 +2,9 @@ package com.healthapp.appointment.web.controller;
 
 import com.healthapp.appointment.application.dto.AppointmentDto;
 import com.healthapp.appointment.application.service.AppointmentApplicationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,6 +12,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/appointments")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Appointments", description = "Appointment management operations")
+@SecurityRequirement(name = "bearer-key")
 public class AppointmentController {
     private final AppointmentApplicationService appointmentService;
     
@@ -17,6 +22,7 @@ public class AppointmentController {
     }
     
     @PostMapping
+    @Operation(summary = "Book a new appointment", description = "Allows patients to book appointments with doctors")
     public AppointmentDto bookAppointment(@RequestBody BookAppointmentRequest request) {
         return appointmentService.bookAppointment(
             request.patientId(),
@@ -27,6 +33,7 @@ public class AppointmentController {
     }
     
     @GetMapping
+    @Operation(summary = "Get appointments", description = "Retrieve appointments by patient ID or doctor ID")
     public List<AppointmentDto> getAppointments(@RequestParam(required = false) Long patientId,
                                               @RequestParam(required = false) Long doctorId) {
         if (patientId != null) {
